@@ -2,21 +2,22 @@
 <html lang="ru" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>MyGit — Трекер контента</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>MyGit — Трекер контента с рейтингом</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
       background: #0a0a0f;
+      overflow-x: hidden;
     }
 
-    /* плавность для всех переходов */
     #sidebar,
     .menu-text,
     #logo-text,
@@ -25,14 +26,18 @@
       transition: all 0.2s ease-in-out;
     }
 
-    /* БОКОВОЕ МЕНЮ — круглое, без скролла */
     #sidebar {
       border-top-right-radius: 32px;
       border-bottom-right-radius: 32px;
-      overflow-y: hidden !important;
+      overflow-y: hidden !important; /* главное — убираем скролл */
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
     
+    /* контент внутри сайдбара без скролла */
     #sidebar .flex-1 {
       overflow-y: visible;
       overflow-x: visible;
@@ -41,8 +46,23 @@
     #sidebar .border-t {
       overflow-y: visible;
     }
-
-    /* Стили для пунктов меню — иконки по центру в свернутом состоянии */
+    
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s;
+    }
+    
+    body.sidebar-mobile-open .sidebar-overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+    
     .menu-item {
       border-radius: 20px;
       margin: 4px 0;
@@ -51,9 +71,9 @@
       align-items: center;
       justify-content: flex-start;
       position: relative;
+      cursor: pointer;
     }
     
-    /* В свернутом состоянии иконка по центру */
     .sidebar-collapsed .menu-item {
       justify-content: center;
       padding: 12px 0 !important;
@@ -103,6 +123,7 @@
     #toggle-btn-bottom {
       background: linear-gradient(135deg, #2c2c3a 0%, #27272a 100%);
       border: 1px solid rgba(139, 92, 246, 0.2);
+      transition: all 0.2s;
     }
     
     #toggle-btn-bottom:hover {
@@ -111,16 +132,6 @@
       transform: translateY(-1px);
     }
 
-    /* Кнопки экспорта/импорта */
-    .data-action-btn {
-      transition: all 0.2s;
-      border-radius: 16px;
-    }
-    .data-action-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    /* ВЫПАДАЮЩИЙ СПИСОК — полностью закругленный, без влияния темы */
     .section-select-custom {
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23999' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
@@ -130,7 +141,6 @@
       border-radius: 24px !important;
     }
     
-    /* Фиксируем стили для select в любой теме */
     select.section-select-custom,
     select#section-select {
       border-radius: 24px;
@@ -145,22 +155,11 @@
       border: 1px solid rgb(82 82 91) !important;
     }
     
-    /* Стили для опций select */
-    select#section-select option {
-      background-color: rgb(24 24 27);
-      color: rgb(212 212 216);
-      border-radius: 16px;
-    }
-    
-    html.light select#section-select option {
-      background-color: rgb(39 39 42);
-      color: rgb(228 228 231);
-    }
-
     textarea {
       resize: none;
       overflow-y: auto;
       line-height: 1.5;
+      font-size: 16px;
     }
 
     .content-card {
@@ -172,68 +171,77 @@
       transform: translateY(-2px);
     }
 
-    /* Анимация для уведомлений */
     .toast-notification {
       animation: slideIn 0.3s ease-out;
     }
     @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* тёмная/светлая тема */
-    html.dark body {
-      background-color: #09090b;
+    .rating-star {
+      cursor: pointer;
+      transition: transform 0.1s ease, color 0.1s;
+      font-size: 1rem;
     }
-    html.light body {
-      background-color: #f4f4f9;
+    .rating-star:hover {
+      transform: scale(1.15);
     }
-    html.light .bg-zinc-950 {
-      background-color: #ffffff !important;
+    .rating-star-active {
+      color: #fbbf24;
+      text-shadow: 0 0 2px rgba(251,191,36,0.5);
     }
-    html.light .bg-zinc-900 {
-      background-color: #f0f0f5 !important;
+    .rating-star-inactive {
+      color: #4a4a55;
     }
-    html.light .border-zinc-700 {
-      border-color: #d4d4d8 !important;
-    }
-    html.light .text-zinc-300, 
-    html.light .text-zinc-400,
-    html.light .text-zinc-500 {
-      color: #3f3f46;
-    }
-    html.light .text-zinc-100 {
-      color: #18181b;
-    }
-    html.light #sidebar {
-      background-color: #fefefe;
-      border-right-color: #e4e4e7;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
-    }
-    html.light .menu-item.active {
-      background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%);
-    }
-    html.light .menu-item.active i {
-      color: #7c3aed;
-    }
-    html.light .bg-zinc-800 {
-      background-color: #e4e4e9;
-    }
-    html.light #toggle-btn-bottom {
-      background: linear-gradient(135deg, #e8e8ef 0%, #dfdfe6 100%);
-      color: #1f1f2e;
-      border-color: rgba(124, 58, 237, 0.2);
-    }
-    html.light .bg-violet-600 {
-      background-color: #7c3aed;
+    html.light .rating-star-inactive {
+      color: #cbd5e1;
     }
     
+    .stars-container {
+      display: inline-flex;
+      gap: 3px;
+      align-items: center;
+    }
+    .star-filled {
+      color: #fbbf24;
+    }
+    .star-empty {
+      color: #4a4a55;
+    }
+    html.light .star-empty {
+      color: #cbd5e1;
+    }
+
+    html.dark body { background-color: #09090b; }
+    html.light body { background-color: #f4f4f9; }
+    html.light .bg-zinc-950 { background-color: #ffffff !important; }
+    html.light .bg-zinc-900 { background-color: #f0f0f5 !important; }
+    html.light .border-zinc-700 { border-color: #d4d4d8 !important; }
+    html.light .text-zinc-300, .text-zinc-400, .text-zinc-500 { color: #3f3f46; }
+    html.light .text-zinc-100 { color: #18181b; }
+    html.light #sidebar { background-color: #fefefe; border-right-color: #e4e4e7; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05); }
+    html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
+    html.light .menu-item.active i { color: #7c3aed; }
+    html.light .bg-violet-600 { background-color: #7c3aed; }
+    
+    @media (max-width: 768px) {
+      #main-content { margin-left: 0 !important; transition: margin-left 0.3s; }
+      #sidebar { transform: translateX(-100%); width: 260px !important; position: fixed; border-radius: 0 32px 32px 0; }
+      body.sidebar-mobile-open #sidebar { transform: translateX(0); }
+      .sidebar-overlay { display: block; }
+      .mobile-menu-toggle { display: flex; }
+      .menu-text { opacity: 1 !important; display: inline-block !important; }
+      #logo-text { opacity: 1 !important; }
+      #toggle-btn-top, #toggle-btn-bottom { display: none; }
+      #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; }
+      #sidebar .menu-item i { margin: 0 16px 0 0 !important; }
+    }
+    @media (min-width: 769px) { .sidebar-overlay, .mobile-menu-toggle { display: none; } }
+    .mobile-menu-toggle { background: transparent; border: none; cursor: pointer; }
+    @media (max-width: 640px) { .p-6 { padding: 1rem; } .text-3xl { font-size: 1.75rem; } }
+    
+    /* Скрываем скролл у сайдбара полностью */
     #sidebar::-webkit-scrollbar {
       display: none;
     }
@@ -241,121 +249,96 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    
-    /* Стили для контейнера иконок в свернутом режиме */
-    .menu-item {
-      padding-left: 12px;
-      padding-right: 12px;
-    }
   </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex overflow-hidden">
 
-  <!-- БОКОВОЕ МЕНЮ -->
-  <div id="sidebar" class="w-16 bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50 sidebar-collapsed" style="width: 64px; overflow-y: hidden; border-top-right-radius: 32px; border-bottom-right-radius: 32px;">
+  <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
+  <!-- БОКОВОЕ МЕНЮ - скролл убран -->
+  <div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px; overflow-y: hidden;">
+    <!-- Верхняя часть с логотипом и кнопкой свернуть/развернуть -->
     <div class="p-5 flex items-center justify-between border-b border-zinc-700/50" style="border-top-right-radius: 32px;">
       <div class="flex items-center gap-3 overflow-hidden">
         <div class="w-8 h-8 bg-gradient-to-br from-white to-gray-200 rounded-2xl flex items-center justify-center text-black font-bold text-xl shadow-md">M</div>
-        <span id="logo-text" class="text-xl font-semibold tracking-tight whitespace-nowrap opacity-0 transition-opacity duration-200">MyGit</span>
+        <span id="logo-text" class="text-xl font-semibold tracking-tight whitespace-nowrap">MyGit</span>
       </div>
-      <button onclick="toggleSidebar()" id="toggle-btn-top"
+      <button onclick="toggleSidebarDesktop()" id="toggle-btn-top"
               class="text-zinc-300 hover:text-white p-2 rounded-xl hover:bg-zinc-800/80 transition-all duration-200 focus:outline-none">
         <i class="fa-solid fa-chevron-right text-xl"></i>
       </button>
     </div>
 
+    <!-- Меню (без скролла) -->
     <div class="flex-1 py-6 px-3 space-y-1.5">
-      <a href="#" onclick="switchSection('home'); setActiveMenu(this)" 
-         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
-        <i class="fa-solid fa-house w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Главная</span>
+      <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
+        <i class="fa-solid fa-house w-6 h-6 text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap">Главная</span>
       </a>
-      <a href="#" onclick="switchSection('books'); setActiveMenu(this)" 
-         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
-        <i class="fa-solid fa-book w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Книги</span>
+      <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
+        <i class="fa-solid fa-book w-6 h-6 text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap">Книги</span>
       </a>
-      <a href="#" onclick="switchSection('series'); setActiveMenu(this)" 
-         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
-        <i class="fa-solid fa-tv w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Сериалы</span>
+      <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
+        <i class="fa-solid fa-tv w-6 h-6 text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap">Сериалы</span>
       </a>
-      <a href="#" onclick="switchSection('movies'); setActiveMenu(this)" 
-         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
-        <i class="fa-solid fa-film w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Кино</span>
+      <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
+        <i class="fa-solid fa-film w-6 h-6 text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap">Кино</span>
       </a>
-      <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this)" 
-         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
-        <i class="fa-solid fa-heart w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">WishList</span>
+      <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
+        <i class="fa-solid fa-heart w-6 h-6 text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap">WishList</span>
       </a>
     </div>
 
+    <!-- Нижняя кнопка: в свернутом состоянии только стрелка, в развернутом текст+стрелка -->
     <div class="p-4 border-t border-zinc-700/50" style="border-bottom-right-radius: 32px;">
-      <button onclick="toggleSidebar()" id="toggle-btn-bottom"
+      <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom"
               class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl transition-all duration-200 text-sm font-medium group">
         <i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Свернуть меню</span>
+        <span id="bottom-toggle-text" class="menu-text text-sm font-medium whitespace-nowrap">Свернуть меню</span>
       </button>
     </div>
   </div>
 
-  <!-- ОСНОВНОЙ КОНТЕНТ -->
-  <div class="flex-1 flex flex-col h-screen ml-16 transition-all duration-300" id="main-content">
-    <!-- Верхний хедер с кнопками экспорта/импорта -->
-    <div class="h-14 border-b border-zinc-700 flex items-center px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-3">
-      <button onclick="toggleSidebar()" id="toggle-btn-header" class="text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden">
+  <div class="flex-1 flex flex-col h-screen ml-0 md:ml-16 transition-all duration-300" id="main-content">
+    <div class="h-14 border-b border-zinc-700 flex items-center px-4 md:px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-2">
+      <button onclick="toggleMobileSidebar()" class="mobile-menu-toggle text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden">
         <i class="fa-solid fa-bars text-2xl"></i>
       </button>
-      <div id="header-title" class="text-xl font-medium tracking-tight ml-2 md:ml-0 flex-1">Главная</div>
-      
-      <!-- Кнопка экспорта данных -->
-      <button onclick="exportData()" class="text-zinc-400 hover:text-green-400 p-2 rounded-full transition-colors group relative" title="Экспорт в JSON">
+      <div id="header-title" class="text-xl font-medium tracking-tight flex-1 truncate">Главная</div>
+      <button onclick="exportData()" class="text-zinc-400 hover:text-green-400 p-2 rounded-full transition-colors" title="Экспорт в JSON">
         <i class="fa-solid fa-download text-xl"></i>
       </button>
-      
-      <!-- Кнопка импорта данных -->
-      <label for="import-file-input" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full transition-colors cursor-pointer group relative" title="Импорт из JSON">
+      <label for="import-file-input" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full transition-colors cursor-pointer" title="Импорт из JSON">
         <i class="fa-solid fa-upload text-xl"></i>
       </label>
       <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importData(this)">
-      
       <button onclick="toggleTheme()" class="text-zinc-400 hover:text-white p-2 rounded-full transition-colors">
         <i id="theme-icon-header" class="fa-solid fa-sun text-xl"></i>
       </button>
     </div>
 
-    <!-- Центральная область -->
-    <div class="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto">
-      
-      <!-- Главный экран -->
-      <div id="home-screen" class="w-full max-w-2xl mt-6 md:mt-12">
-        <div class="text-center mb-8 md:mb-12">
-          <p class="text-3xl md:text-4xl font-light bg-gradient-to-r from-zinc-200 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p>
-          <p class="text-zinc-500 text-sm mt-2">Заметки, книги, фильмы — всё под рукой</p>
+    <div class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto">
+      <div id="home-screen" class="w-full max-w-2xl mt-4 md:mt-12">
+        <div class="text-center mb-6 md:mb-12">
+          <p class="text-2xl md:text-4xl font-light bg-gradient-to-r from-zinc-200 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p>
+          <p class="text-zinc-500 text-xs md:text-sm mt-2">Заметки, книги, фильмы — ставьте рейтинг!</p>
         </div>
-
         <div class="w-full">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 shadow-2xl transition-all gap-2">
-            <select id="section-select" 
-                    class="section-select-custom bg-transparent border-0 text-zinc-300 text-base font-medium px-5 py-4 rounded-2xl focus:outline-none cursor-pointer hover:bg-zinc-800 transition-colors sm:w-auto"
-                    style="border-radius: 24px !important; background-color: #27272a !important;">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 shadow-2xl gap-2">
+            <select id="section-select" class="section-select-custom bg-transparent border-0 text-zinc-300 text-base font-medium px-4 py-3 rounded-2xl focus:outline-none cursor-pointer hover:bg-zinc-800 transition-colors sm:w-auto" style="background-color: #27272a !important;">
               <option value="books">📚 Книги</option>
               <option value="series">📺 Сериалы</option>
               <option value="movies">🎬 Кино</option>
               <option value="wishlist">💖 WishList</option>
             </select>
-
             <div class="flex-1 relative">
-              <textarea id="input" rows="1"
-                class="w-full bg-transparent border-0 focus:outline-none text-base py-4 px-4 resize-none overflow-hidden placeholder-zinc-500"
-                placeholder="Название или идея..."></textarea>
+              <textarea id="input" rows="1" class="w-full bg-transparent border-0 focus:outline-none text-base py-3 px-3 resize-none overflow-hidden placeholder-zinc-500" placeholder="Название или идея..."></textarea>
             </div>
-
-            <button onclick="sendMessage()" 
-                    class="bg-violet-600 hover:bg-violet-700 w-11 h-11 flex items-center justify-center rounded-2xl mx-1 transition-all active:scale-95">
+            <button onclick="sendMessage()" class="bg-violet-600 hover:bg-violet-700 w-11 h-11 flex items-center justify-center rounded-2xl mx-1 transition-all active:scale-95 shrink-0">
               <i class="fa-solid fa-paper-plane text-white text-lg"></i>
             </button>
           </div>
@@ -363,10 +346,9 @@
         </div>
       </div>
 
-      <!-- Экран списков -->
       <div id="section-screen" class="w-full max-w-3xl hidden mt-4">
         <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
-          <h2 id="content-title" class="text-2xl font-semibold text-zinc-200 border-l-4 border-violet-500 pl-4"></h2>
+          <h2 id="content-title" class="text-xl md:text-2xl font-semibold text-zinc-200 border-l-4 border-violet-500 pl-4"></h2>
           <button onclick="switchSection('home')" class="text-sm bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full transition-colors">
             <i class="fa-solid fa-plus mr-1"></i> Добавить новое
           </button>
@@ -376,16 +358,13 @@
     </div>
   </div>
 
-  <!-- Компонент уведомлений -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2"></div>
+  <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 z-[100] flex flex-col gap-2 w-full max-w-[90%] md:max-w-md"></div>
 
   <script>
-    // --- СОСТОЯНИЯ ---
     let isDark = true;
     let currentSection = 'home';
     let isCollapsed = true;
 
-    // --- ДАННЫЕ ИЗ LOCALSTORAGE ---
     let data = {
       books: JSON.parse(localStorage.getItem('books')) || [],
       series: JSON.parse(localStorage.getItem('series')) || [],
@@ -393,22 +372,14 @@
       wishlist: JSON.parse(localStorage.getItem('wishlist')) || []
     };
 
-    // --- ФУНКЦИЯ ДЛЯ ПОКАЗА УВЕДОМЛЕНИЙ ---
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       const bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
       const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
-      
       toast.className = `${bgColor} text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 toast-notification`;
-      toast.style.minWidth = '200px';
-      toast.innerHTML = `
-        <i class="fa-solid ${icon} text-lg"></i>
-        <span class="text-sm font-medium">${message}</span>
-      `;
-      
+      toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span class="text-sm font-medium break-words">${message}</span>`;
       container.appendChild(toast);
-      
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(20px)';
@@ -417,22 +388,20 @@
       }, 2500);
     }
 
-    // --- ЭКСПОРТ ДАННЫХ В JSON ---
+    function updateItemRating(section, itemId, newRating) {
+      const item = data[section].find(i => i.id === itemId);
+      if (item) {
+        item.rating = newRating;
+        localStorage.setItem(section, JSON.stringify(data[section]));
+        if (currentSection === section) renderContent(section);
+        showToast(`⭐ Рейтинг изменён на ${newRating}`, 'success');
+      }
+    }
+
     function exportData() {
       try {
-        const exportData = {
-          version: "1.0",
-          exportDate: new Date().toISOString(),
-          data: {
-            books: data.books,
-            series: data.series,
-            movies: data.movies,
-            wishlist: data.wishlist
-          }
-        };
-        
-        const jsonStr = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const exportData = { version: "1.1", exportDate: new Date().toISOString(), data: { books: data.books, series: data.series, movies: data.movies, wishlist: data.wishlist } };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -441,35 +410,21 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
         showToast('✅ Данные успешно экспортированы!', 'success');
-      } catch (error) {
-        console.error('Export error:', error);
-        showToast('❌ Ошибка при экспорте данных', 'error');
-      }
+      } catch (error) { showToast('❌ Ошибка при экспорте', 'error'); }
     }
 
-    // --- ИМПОРТ ДАННЫХ ИЗ JSON ---
     function importData(input) {
       const file = input.files[0];
       if (!file) return;
-      
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          
           let newData = null;
-          
-          if (imported.version && imported.data && imported.data.books) {
-            newData = imported.data;
-          }
-          else if (imported.books && imported.series && imported.movies && imported.wishlist) {
-            newData = imported;
-          }
-          else {
-            throw new Error('Неверный формат файла');
-          }
+          if (imported.version && imported.data && imported.data.books) newData = imported.data;
+          else if (imported.books && imported.series && imported.movies && imported.wishlist) newData = imported;
+          else throw new Error('Неверный формат');
           
           data.books = newData.books || [];
           data.series = newData.series || [];
@@ -480,143 +435,30 @@
           localStorage.setItem('series', JSON.stringify(data.series));
           localStorage.setItem('movies', JSON.stringify(data.movies));
           localStorage.setItem('wishlist', JSON.stringify(data.wishlist));
-          
-          if (currentSection !== 'home') {
-            renderContent(currentSection);
-          }
-          
-          showToast(`📦 Импорт завершён! Загружено: ${data.books.length + data.series.length + data.movies.length + data.wishlist.length} записей`, 'success');
-          
+          if (currentSection !== 'home') renderContent(currentSection);
+          showToast(`📦 Импорт завершён!`, 'success');
           input.value = '';
-        } catch (error) {
-          console.error('Import error:', error);
-          showToast('❌ Ошибка импорта: неверный формат JSON', 'error');
-          input.value = '';
-        }
+        } catch (error) { showToast('❌ Ошибка импорта: неверный JSON', 'error'); input.value = ''; }
       };
-      
-      reader.onerror = function() {
-        showToast('❌ Ошибка при чтении файла', 'error');
-        input.value = '';
-      };
-      
+      reader.onerror = () => { showToast('❌ Ошибка чтения файла', 'error'); input.value = ''; };
       reader.readAsText(file);
-    }
-
-    // --- ОСТАЛЬНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ ---
-    
-    function updateAllToggleVisuals() {
-      const topIcon = document.querySelector('#toggle-btn-top i');
-      const bottomIcon = document.querySelector('#bottom-toggle-icon');
-      const bottomSpan = document.querySelector('#toggle-btn-bottom .menu-text');
-      
-      if (topIcon) {
-        if (isCollapsed) {
-          topIcon.classList.remove('fa-chevron-left');
-          topIcon.classList.add('fa-chevron-right');
-        } else {
-          topIcon.classList.remove('fa-chevron-right');
-          topIcon.classList.add('fa-chevron-left');
-        }
-      }
-      
-      if (bottomIcon) {
-        if (isCollapsed) {
-          bottomIcon.classList.remove('fa-chevron-left');
-          bottomIcon.classList.add('fa-chevron-right');
-        } else {
-          bottomIcon.classList.remove('fa-chevron-right');
-          bottomIcon.classList.add('fa-chevron-left');
-        }
-      }
-      
-      if (bottomSpan) {
-        bottomSpan.textContent = isCollapsed ? 'Развернуть меню' : 'Свернуть меню';
-      }
-    }
-    
-    // Функция обновления класса для центрирования иконок
-    function updateSidebarCollapsedClass() {
-      const sidebar = document.getElementById('sidebar');
-      if (isCollapsed) {
-        sidebar.classList.add('sidebar-collapsed');
-        // В свернутом режиме убираем отступы у пунктов меню и центрируем
-        const menuItems = document.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
-          item.style.justifyContent = 'center';
-          item.style.paddingLeft = '0';
-          item.style.paddingRight = '0';
-        });
-      } else {
-        sidebar.classList.remove('sidebar-collapsed');
-        const menuItems = document.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
-          item.style.justifyContent = 'flex-start';
-          item.style.paddingLeft = '16px';
-          item.style.paddingRight = '16px';
-        });
-      }
-    }
-
-    function toggleSidebar() {
-      isCollapsed = !isCollapsed;
-      const sidebar = document.getElementById('sidebar');
-      const logoText = document.getElementById('logo-text');
-      const menuTexts = document.querySelectorAll('.menu-text');
-      const mainContent = document.getElementById('main-content');
-      
-      if (!sidebar) return;
-      
-      if (isCollapsed) {
-        sidebar.style.width = '64px';
-        if (mainContent) mainContent.style.marginLeft = '64px';
-        logoText?.classList.add('opacity-0');
-        menuTexts.forEach(text => text.classList.add('opacity-0'));
-      } else {
-        sidebar.style.width = '260px';
-        if (mainContent) mainContent.style.marginLeft = '260px';
-        logoText?.classList.remove('opacity-0');
-        menuTexts.forEach(text => text.classList.remove('opacity-0'));
-      }
-      
-      updateSidebarCollapsedClass();
-      updateAllToggleVisuals();
-      
-      if (window.innerWidth < 768) {
-        if (!isCollapsed) {
-          sidebar.style.zIndex = '1000';
-        } else {
-          sidebar.style.zIndex = '50';
-        }
-      }
-    }
-
-    function setActiveMenu(element) {
-      document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-      if (element) element.classList.add('active');
     }
 
     function sendMessage() {
       const input = document.getElementById('input');
       const select = document.getElementById('section-select');
       if (!input.value.trim()) return;
-      
       const text = input.value.trim();
       const section = select.value;
-      
-      const newItem = {
-        id: Date.now(),
-        text: text,
-        date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+      const newItem = { 
+        id: Date.now(), 
+        text: text, 
+        date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }),
+        rating: 0 
       };
-      
       data[section].unshift(newItem);
       localStorage.setItem(section, JSON.stringify(data[section]));
-      
-      if (currentSection === section) {
-        renderContent(section);
-      }
-      
+      if (currentSection === section) renderContent(section);
       input.value = '';
       input.style.height = 'auto';
       showToast(`➕ Добавлено в ${select.options[select.selectedIndex].text}`, 'success');
@@ -627,74 +469,78 @@
       const titleEl = document.getElementById('content-title');
       const sectionScreen = document.getElementById('section-screen');
       const homeScreen = document.getElementById('home-screen');
-      
-      const sectionNames = {
-        books: "📖 Книги",
-        series: "📺 Сериалы",
-        movies: "🎬 Кино",
-        wishlist: "❤️ WishList"
-      };
-      
+      const sectionNames = { books: "📖 Книги", series: "📺 Сериалы", movies: "🎬 Кино", wishlist: "❤️ WishList" };
       titleEl.textContent = sectionNames[section] || section;
       container.innerHTML = '';
-      
       const items = data[section];
       if (!items.length) {
         container.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>Пока ничего нет. Добавьте первый элемент!</p></div>`;
       } else {
         items.forEach(item => {
+          const rating = item.rating || 0;
           const card = document.createElement('div');
-          card.className = "bg-zinc-900 border border-zinc-700 rounded-2xl p-5 content-card transition-all shadow-md";
+          card.className = "bg-zinc-900 border border-zinc-700 rounded-2xl p-4 md:p-5 content-card transition-all shadow-md";
+          
+          const starsDiv = document.createElement('div');
+          starsDiv.className = 'flex items-center gap-2 mt-2 pt-1 border-t border-zinc-800/50';
+          const starsLabel = document.createElement('span');
+          starsLabel.className = 'text-xs text-zinc-500 mr-1';
+          starsLabel.textContent = 'Рейтинг:';
+          const starsContainer = document.createElement('div');
+          starsContainer.className = 'stars-container';
+          
+          for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('i');
+            star.className = `fa-${i <= rating ? 'solid' : 'regular'} fa-star rating-star ${i <= rating ? 'rating-star-active' : 'rating-star-inactive'}`;
+            star.style.fontSize = '0.85rem';
+            star.style.cursor = 'pointer';
+            star.style.marginRight = '2px';
+            star.addEventListener('click', (e) => {
+              e.stopPropagation();
+              updateItemRating(section, item.id, i);
+            });
+            starsContainer.appendChild(star);
+          }
+          starsDiv.appendChild(starsLabel);
+          starsDiv.appendChild(starsContainer);
+          
+          const ratingTextSpan = document.createElement('span');
+          ratingTextSpan.className = 'text-xs text-zinc-400 ml-2';
+          ratingTextSpan.textContent = rating > 0 ? `(${rating})` : 'нет оценки';
+          starsDiv.appendChild(ratingTextSpan);
+          
           card.innerHTML = `
             <div class="flex justify-between items-start gap-3">
-              <p class="text-zinc-200 text-base leading-relaxed break-words flex-1">${escapeHtml(item.text)}</p>
-              <button onclick="deleteItem('${section}', ${item.id})" class="text-zinc-500 hover:text-red-400 transition-colors">
+              <p class="text-zinc-200 text-sm md:text-base leading-relaxed break-words flex-1">${escapeHtml(item.text)}</p>
+              <button onclick="deleteItem('${section}', ${item.id})" class="text-zinc-500 hover:text-red-400 transition-colors shrink-0">
                 <i class="fa-regular fa-trash-can"></i>
               </button>
             </div>
-            <p class="text-xs text-zinc-500 mt-3 flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ${item.date}</p>
+            <p class="text-xs text-zinc-500 mt-2 flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ${item.date}</p>
           `;
+          card.appendChild(starsDiv);
           container.appendChild(card);
         });
       }
-      
       homeScreen.classList.add('hidden');
       sectionScreen.classList.remove('hidden');
     }
     
-    function escapeHtml(str) {
-      return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-      });
-    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
     
     window.deleteItem = function(section, id) {
       data[section] = data[section].filter(item => item.id !== id);
       localStorage.setItem(section, JSON.stringify(data[section]));
-      if (currentSection === section) {
-        renderContent(section);
-      }
+      if (currentSection === section) renderContent(section);
       showToast(`🗑️ Элемент удалён`, 'info');
     };
     
     function switchSection(section) {
       currentSection = section;
-      const headerTitles = {
-        home: "🏠 Главная",
-        books: "📚 Книги",
-        series: "📺 Сериалы",
-        movies: "🎬 Кино",
-        wishlist: "💖 WishList"
-      };
-      const headerEl = document.getElementById('header-title');
-      if (headerEl) headerEl.textContent = headerTitles[section] || section;
-      
+      const headerTitles = { home: "🏠 Главная", books: "📚 Книги", series: "📺 Сериалы", movies: "🎬 Кино", wishlist: "💖 WishList" };
+      document.getElementById('header-title').textContent = headerTitles[section] || section;
       const homeScreen = document.getElementById('home-screen');
       const sectionScreen = document.getElementById('section-screen');
-      
       if (section === 'home') {
         homeScreen.classList.remove('hidden');
         sectionScreen.classList.add('hidden');
@@ -703,12 +549,15 @@
         if (homeMenuItem) homeMenuItem.classList.add('active');
       } else {
         renderContent(section);
-        const activeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => {
-          const span = el.querySelector('span');
-          return span && span.textContent.toLowerCase() === section;
-        });
+        const activeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => { const span = el.querySelector('span'); return span && span.textContent.toLowerCase() === section; });
         if (activeMenuItem) setActiveMenu(activeMenuItem);
       }
+      closeMobileSidebar();
+    }
+    
+    function setActiveMenu(element) {
+      document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+      if (element) element.classList.add('active');
     }
     
     function toggleTheme() {
@@ -717,56 +566,105 @@
       if (isDark) {
         html.classList.remove('light');
         html.classList.add('dark');
-        const headerIcon = document.getElementById('theme-icon-header');
-        if (headerIcon) {
-          headerIcon.classList.remove('fa-moon');
-          headerIcon.classList.add('fa-sun');
-        }
+        const icon = document.getElementById('theme-icon-header');
+        if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
       } else {
         html.classList.remove('dark');
         html.classList.add('light');
-        const headerIcon = document.getElementById('theme-icon-header');
-        if (headerIcon) {
-          headerIcon.classList.remove('fa-sun');
-          headerIcon.classList.add('fa-moon');
-        }
+        const icon = document.getElementById('theme-icon-header');
+        if (icon) { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
       }
     }
+    
+    function updateBottomButtonState() {
+      const bottomText = document.getElementById('bottom-toggle-text');
+      const bottomIcon = document.getElementById('bottom-toggle-icon');
+      if (!bottomText || !bottomIcon) return;
+      if (isCollapsed) {
+        bottomText.style.display = 'none';
+        bottomIcon.className = 'fa-solid fa-chevron-right text-lg';
+      } else {
+        bottomText.style.display = 'inline-block';
+        bottomIcon.className = 'fa-solid fa-chevron-left text-lg';
+      }
+    }
+    
+    function toggleSidebarDesktop() {
+      if (window.innerWidth <= 768) return;
+      isCollapsed = !isCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('main-content');
+      const topIcon = document.querySelector('#toggle-btn-top i');
+      
+      if (isCollapsed) {
+        sidebar.style.width = '64px';
+        main.style.marginLeft = '64px';
+        sidebar.classList.add('sidebar-collapsed');
+        document.querySelectorAll('.menu-item').forEach(item => { 
+          item.style.justifyContent = 'center'; 
+          item.style.paddingLeft = '0'; 
+          item.style.paddingRight = '0'; 
+        });
+        if (topIcon) topIcon.className = 'fa-solid fa-chevron-right text-xl';
+      } else {
+        sidebar.style.width = '260px';
+        main.style.marginLeft = '260px';
+        sidebar.classList.remove('sidebar-collapsed');
+        document.querySelectorAll('.menu-item').forEach(item => { 
+          item.style.justifyContent = 'flex-start'; 
+          item.style.paddingLeft = '16px'; 
+          item.style.paddingRight = '16px'; 
+        });
+        if (topIcon) topIcon.className = 'fa-solid fa-chevron-left text-xl';
+      }
+      updateBottomButtonState();
+    }
+    
+    function toggleMobileSidebar() { document.body.classList.toggle('sidebar-mobile-open'); }
+    function closeMobileSidebar() { document.body.classList.remove('sidebar-mobile-open'); }
     
     const textarea = document.getElementById('input');
     if (textarea) {
-      textarea.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 160) + 'px';
-      });
-      textarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-        }
-      });
+      textarea.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 160) + 'px'; });
+      textarea.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
     }
     
     window.addEventListener('DOMContentLoaded', () => {
-      const sidebar = document.getElementById('sidebar');
-      const mainContentDiv = document.getElementById('main-content');
-      if (sidebar) {
+      if (window.innerWidth > 768) {
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main-content');
         sidebar.style.width = '64px';
-        sidebar.style.overflowY = 'hidden';
+        main.style.marginLeft = '64px';
+        sidebar.classList.add('sidebar-collapsed');
+        isCollapsed = true;
+        document.querySelectorAll('.menu-item').forEach(item => { 
+          item.style.justifyContent = 'center'; 
+          item.style.paddingLeft = '0'; 
+          item.style.paddingRight = '0'; 
+        });
+        const topIcon = document.querySelector('#toggle-btn-top i');
+        if (topIcon) topIcon.className = 'fa-solid fa-chevron-right text-xl';
+        updateBottomButtonState();
+      } else {
+        document.getElementById('main-content').style.marginLeft = '0px';
+        const bottomText = document.getElementById('bottom-toggle-text');
+        if (bottomText) bottomText.style.display = 'inline-block';
       }
-      if (mainContentDiv) mainContentDiv.style.marginLeft = '64px';
-      
-      document.querySelectorAll('.menu-text').forEach(t => t.classList.add('opacity-0'));
-      const logo = document.getElementById('logo-text');
-      if (logo) logo.classList.add('opacity-0');
-      
-      isCollapsed = true;
-      updateSidebarCollapsedClass();
-      updateAllToggleVisuals();
       switchSection('home');
-      
-      const homeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => el.querySelector('span')?.textContent === 'Главная');
-      if (homeMenuItem) homeMenuItem.classList.add('active');
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+          document.body.classList.remove('sidebar-mobile-open');
+          if (isCollapsed) {
+            document.getElementById('sidebar').style.width = '64px';
+            document.getElementById('main-content').style.marginLeft = '64px';
+          } else {
+            document.getElementById('sidebar').style.width = '260px';
+            document.getElementById('main-content').style.marginLeft = '260px';
+          }
+        } else {
+          document.getElementById('main-content').style.marginLeft = '0px';
+        }
+      });
     });
   </script>
 </body>
