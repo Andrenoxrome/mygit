@@ -1,3 +1,5 @@
+Вот обновленная версия с красивым, современным логотипом для трекера контента.
+```html
 <!DOCTYPE html>
 <html lang="ru" class="dark">
 <head>
@@ -32,6 +34,58 @@
     .tag-active { background: #8b5cf6; color: white; }
     .modal { transition: opacity 0.2s ease; }
     
+    /* Красивый логотип */
+    .logo-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3), 0 0 0 2px rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
+      border-radius: 20px;
+    }
+    .logo-icon i {
+      font-size: 1.4rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .logo-icon:hover {
+      transform: scale(1.02) rotate(2deg);
+      box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4);
+    }
+    .logo-text {
+      font-size: 1.35rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f4f4f5 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+    html.light .logo-text {
+      background: linear-gradient(135deg, #18181b 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    
     select, select:focus, select:active, select option { outline: none; }
     select#section-select, select#edit-status {
       background-color: rgb(39 39 42) !important;
@@ -59,10 +113,13 @@
       .sidebar-overlay { display: block; }
       .mobile-menu-toggle { display: flex; }
       .menu-text { opacity: 1 !important; display: inline-block !important; }
-      #logo-text { opacity: 1 !important; }
+      #logo-text { opacity: 1 !important; display: inline-block !important; }
       #toggle-btn-top, #toggle-btn-bottom { display: none; }
       #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; }
       .search-filter-container { flex-direction: column; align-items: stretch !important; }
+      .logo-icon { width: 36px; height: 36px; }
+      .logo-icon i { font-size: 1.2rem; }
+      .logo-text { font-size: 1.2rem; }
     }
     @media (min-width: 769px) { .sidebar-overlay, .mobile-menu-toggle { display: none; } }
     .mobile-menu-toggle { background: transparent; border: none; cursor: pointer; }
@@ -79,19 +136,14 @@
     html.light .border-zinc-700 { border-color: #d4d4d8 !important; }
     html.light #sidebar { background-color: #fefefe; }
     html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
+    html.light .menu-item.active i { color: #7c3aed; }
     html.light .bg-violet-600 { background-color: #7c3aed; }
     html.light .status-badge { background: #e4e4e9; color: #18181b; }
     html.light .tag { background: #d4d4d8; color: #18181b; }
     html.light .tag-active { background: #7c3aed; color: white; }
     
-    .search-input {
-      transition: all 0.2s;
-    }
-    .filter-tags-container {
-      max-height: 80px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
+    .search-input { transition: all 0.2s; }
+    .filter-tags-container { max-height: 80px; overflow-y: auto; scrollbar-width: thin; }
   </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex overflow-hidden">
@@ -100,18 +152,25 @@
 
 <div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px; overflow-y: hidden;">
   <div class="p-5 flex items-center justify-between border-b border-zinc-700/50">
-    <div class="flex items-center gap-3"><div class="w-8 h-8 bg-gradient-to-br from-white to-gray-200 rounded-2xl flex items-center justify-center text-black font-bold text-xl">M</div><span id="logo-text" class="text-xl font-semibold">MyGit</span></div>
-    <button onclick="toggleSidebarDesktop()" id="toggle-btn-top" class="text-zinc-300 hover:text-white p-2 rounded-xl"><i class="fa-solid fa-chevron-right text-xl"></i></button>
+    <div class="flex items-center gap-3">
+      <div class="logo-wrapper">
+        <div class="logo-icon">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+      </div>
+      <span id="logo-text" class="logo-text">MyGit</span>
+    </div>
+    <button onclick="toggleSidebarDesktop()" id="toggle-btn-top" class="text-zinc-300 hover:text-white p-2 rounded-xl transition-all hover:bg-zinc-800/50"><i class="fa-solid fa-chevron-right text-xl"></i></button>
   </div>
   <div class="flex-1 py-6 px-3 space-y-1.5">
-    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Главная</span></a>
-    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Книги</span></a>
-    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Сериалы</span></a>
-    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Кино</span></a>
-    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">WishList</span></a>
+    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Главная</span></a>
+    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Книги</span></a>
+    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Сериалы</span></a>
+    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Кино</span></a>
+    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">WishList</span></a>
   </div>
   <div class="p-4 border-t border-zinc-700/50">
-    <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl transition-all"><i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i><span id="bottom-toggle-text" class="menu-text text-sm">Свернуть меню</span></button>
+    <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl transition-all hover:bg-zinc-800/50"><i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i><span id="bottom-toggle-text" class="menu-text text-sm">Свернуть меню</span></button>
   </div>
 </div>
 
@@ -119,30 +178,37 @@
   <div class="h-14 border-b border-zinc-700 flex items-center px-4 md:px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-2">
     <button onclick="toggleMobileSidebar()" class="mobile-menu-toggle text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden"><i class="fa-solid fa-bars text-2xl"></i></button>
     <div id="header-title" class="text-xl font-medium tracking-tight flex-1 truncate">Главная</div>
-    <button onclick="exportData('json')" class="text-zinc-400 hover:text-green-400 p-2 rounded-full" title="Экспорт JSON"><i class="fa-solid fa-download text-xl"></i></button>
-    <button onclick="exportData('csv')" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full" title="Экспорт CSV"><i class="fa-solid fa-table text-xl"></i></button>
-    <button onclick="exportData('txt')" class="text-zinc-400 hover:text-yellow-400 p-2 rounded-full" title="Экспорт TXT"><i class="fa-solid fa-file-lines text-xl"></i></button>
-    <label for="import-file-input" class="text-zinc-400 hover:text-violet-400 p-2 rounded-full cursor-pointer"><i class="fa-solid fa-upload text-xl"></i></label>
+    <button onclick="exportData('json')" class="text-zinc-400 hover:text-green-400 p-2 rounded-full transition-all hover:scale-110" title="Экспорт JSON"><i class="fa-solid fa-download text-xl"></i></button>
+    <button onclick="exportData('csv')" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full transition-all hover:scale-110" title="Экспорт CSV"><i class="fa-solid fa-table text-xl"></i></button>
+    <button onclick="exportData('txt')" class="text-zinc-400 hover:text-yellow-400 p-2 rounded-full transition-all hover:scale-110" title="Экспорт TXT"><i class="fa-solid fa-file-lines text-xl"></i></button>
+    <label for="import-file-input" class="text-zinc-400 hover:text-violet-400 p-2 rounded-full transition-all hover:scale-110 cursor-pointer"><i class="fa-solid fa-upload text-xl"></i></label>
     <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importData(this)">
-    <button onclick="toggleTheme()" class="text-zinc-400 hover:text-white p-2 rounded-full"><i id="theme-icon-header" class="fa-solid fa-sun text-xl"></i></button>
+    <button onclick="toggleTheme()" class="text-zinc-400 hover:text-white p-2 rounded-full transition-all hover:scale-110"><i id="theme-icon-header" class="fa-solid fa-sun text-xl"></i></button>
   </div>
 
   <div class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto">
     <div id="home-screen" class="w-full max-w-2xl mt-4 md:mt-12">
-      <div class="text-center mb-6 md:mb-12"><p class="text-2xl md:text-4xl font-light bg-gradient-to-r from-zinc-200 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p><p class="text-zinc-500 text-xs md:text-sm mt-2">Книги, сериалы, кино — с рейтингом, тегами и прогрессом</p></div>
+      <div class="text-center mb-6 md:mb-12">
+        <div class="inline-flex items-center justify-center mb-4">
+          <div class="logo-icon w-16 h-16 md:w-20 md:h-20 rounded-3xl shadow-2xl">
+            <i class="fa-solid fa-book-open text-2xl md:text-3xl"></i>
+          </div>
+        </div>
+        <p class="text-3xl md:text-5xl font-light bg-gradient-to-r from-zinc-200 via-violet-300 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p>
+        <p class="text-zinc-500 text-xs md:text-sm mt-3">Книги, сериалы, кино — с рейтингом, тегами и прогрессом</p>
+      </div>
       <div class="w-full">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 gap-2">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 gap-2 shadow-xl">
           <select id="section-select" class="text-base font-medium px-4 py-3 focus:outline-none cursor-pointer" style="border-radius: 24px;">
             <option value="books">📚 Книги</option><option value="series">📺 Сериалы</option><option value="movies">🎬 Кино</option><option value="wishlist">💖 WishList</option>
           </select>
           <div class="flex-1 relative"><textarea id="input" rows="1" class="w-full bg-transparent border-0 focus:outline-none text-base py-3 px-3 resize-none placeholder-zinc-500" placeholder="Название..."></textarea></div>
-          <button onclick="sendMessage()" class="bg-violet-600 hover:bg-violet-700 w-11 h-11 flex items-center justify-center rounded-2xl transition-all active:scale-95"><i class="fa-solid fa-paper-plane text-white"></i></button>
+          <button onclick="sendMessage()" class="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 w-11 h-11 flex items-center justify-center rounded-2xl transition-all active:scale-95 shadow-lg"><i class="fa-solid fa-paper-plane text-white"></i></button>
         </div>
         <p class="text-xs text-zinc-500 mt-3 text-center">Нажмите Enter, чтобы добавить</p>
       </div>
     </div>
     <div id="section-screen" class="w-full max-w-4xl hidden mt-4">
-      <!-- Панель поиска и фильтрации -->
       <div class="search-filter-container mb-6 space-y-3">
         <div class="relative">
           <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i>
@@ -163,15 +229,15 @@
 <!-- Модальное окно редактирования -->
 <div id="edit-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[200] hidden transition-all" style="backdrop-filter: blur(4px);">
   <div class="bg-zinc-900 rounded-3xl w-full max-w-lg mx-4 p-6 border border-zinc-700 shadow-2xl">
-    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2"><i class="fa-solid fa-pen"></i> Редактировать</h3>
-    <input type="text" id="edit-title" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400" placeholder="Название">
-    <input type="text" id="edit-tags" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400" placeholder="Теги (через запятую)">
-    <input type="text" id="edit-poster" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400" placeholder="URL обложки/постера">
+    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2"><i class="fa-solid fa-pen text-violet-400"></i> Редактировать</h3>
+    <input type="text" id="edit-title" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Название">
+    <input type="text" id="edit-tags" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Теги (через запятую)">
+    <input type="text" id="edit-poster" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="URL обложки/постера">
     <select id="edit-status" class="w-full p-3 mb-3 text-base rounded-xl cursor-pointer focus:outline-none" style="border-radius: 24px;">
       <option value="planned">📅 В планах</option><option value="progress">⏳ В процессе</option><option value="completed">✅ Завершено</option><option value="abandoned">❌ Брошено</option>
     </select>
-    <div class="flex gap-3 mb-4"><input type="number" id="edit-progress" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white placeholder-zinc-400" placeholder="Прогресс (сезон/серия/страница)" step="1"><span class="text-zinc-400 text-sm self-center">(число)</span></div>
-    <div class="flex gap-3"><button onclick="saveEdit()" class="flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-medium transition">Сохранить</button><button onclick="closeModal()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 py-3 rounded-xl transition">Отмена</button></div>
+    <div class="flex gap-3 mb-4"><input type="number" id="edit-progress" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Прогресс (сезон/серия/страница)" step="1"><span class="text-zinc-400 text-sm self-center">(число)</span></div>
+    <div class="flex gap-3"><button onclick="saveEdit()" class="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 py-3 rounded-xl font-medium transition">Сохранить</button><button onclick="closeModal()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 py-3 rounded-xl transition">Отмена</button></div>
   </div>
 </div>
 
@@ -292,7 +358,7 @@
       let tagsHtml=(item.tags||[]).map(t=>`<span class="tag"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('');
       let posterHtml=item.posterUrl?`<img src="${escapeHtml(item.posterUrl)}" class="w-12 h-16 object-cover rounded-lg shadow-md" onerror="this.style.display='none'" loading="lazy">`:`<div class="w-12 h-16 bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-regular fa-image text-zinc-500 text-xl"></i></div>`;
       let card=document.createElement('div'); card.className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 content-card transition-all shadow-md";
-      card.innerHTML=`<div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p><div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${[1,2,3,4,5].map(i=>`<i class="fa-${i<=rating?'solid':'regular'} fa-star rating-star ${i<=rating?'rating-star-active':'rating-star-inactive'}" style="cursor:pointer;font-size:0.9rem" onclick="updateRating('${section}',${item.id},${i})"></i>`).join('')}</div><span class="status-badge">${statusText}${progressText}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div>`;
+      card.innerHTML=`<div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p><div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1 transition-colors"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1 transition-colors"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${[1,2,3,4,5].map(i=>`<i class="fa-${i<=rating?'solid':'regular'} fa-star rating-star ${i<=rating?'rating-star-active':'rating-star-inactive'}" style="cursor:pointer;font-size:0.9rem" onclick="updateRating('${section}',${item.id},${i})"></i>`).join('')}</div><span class="status-badge">${statusText}${progressText}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div>`;
       container.appendChild(card);
     });
     document.getElementById('home-screen')?.classList.add('hidden'); 
@@ -301,7 +367,8 @@
     let filterInfo = '';
     if(currentSearchQuery) filterInfo += ` 🔍 "${currentSearchQuery}"`;
     if(currentSelectedTag) filterInfo += ` 🏷️ #${currentSelectedTag}`;
-    document.getElementById('content-title')? document.getElementById('content-title').innerHTML=titleMap[section]+` <span class="text-sm text-zinc-500">(${filteredItems.length}/${items.length})</span>${filterInfo ? `<span class="text-xs text-violet-400 ml-2">${filterInfo}</span>` : ''}`:null;
+    let titleElem = document.getElementById('content-title');
+    if(titleElem) titleElem.innerHTML=titleMap[section]+` <span class="text-sm text-zinc-500">(${filteredItems.length}/${items.length})</span>${filterInfo ? `<span class="text-xs text-violet-400 ml-2">${filterInfo}</span>` : ''}`;
   }
 
   function deleteItem(section,id){ data[section]=data[section].filter(i=>i.id!==id); localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); showToast('🗑️ Удалено','info'); }
@@ -357,3 +424,4 @@
 </script>
 </body>
 </html>
+```
