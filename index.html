@@ -1,70 +1,773 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моя страница</title>
-    <style>
-        /* Базовые стили для наглядности */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        header, nav, main, aside, footer {
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>MyGit — Трекер контента</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #0a0a0f;
+    }
+
+    /* плавность для всех переходов */
+    #sidebar,
+    .menu-text,
+    #logo-text,
+    .menu-item i,
+    .menu-item span {
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* БОКОВОЕ МЕНЮ — круглое, без скролла */
+    #sidebar {
+      border-top-right-radius: 32px;
+      border-bottom-right-radius: 32px;
+      overflow-y: hidden !important;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    #sidebar .flex-1 {
+      overflow-y: visible;
+      overflow-x: visible;
+    }
+    
+    #sidebar .border-t {
+      overflow-y: visible;
+    }
+
+    /* Стили для пунктов меню — иконки по центру в свернутом состоянии */
+    .menu-item {
+      border-radius: 20px;
+      margin: 4px 0;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+    }
+    
+    /* В свернутом состоянии иконка по центру */
+    .sidebar-collapsed .menu-item {
+      justify-content: center;
+      padding: 12px 0 !important;
+    }
+    
+    .sidebar-collapsed .menu-item i {
+      margin: 0 auto;
+    }
+    
+    .sidebar-collapsed .menu-item .menu-text {
+      display: none;
+    }
+    
+    .sidebar-collapsed .menu-item {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .menu-item:hover {
+      transform: translateX(2px);
+      background: #2c2c3a;
+    }
+    
+    .sidebar-collapsed .menu-item:hover {
+      transform: translateX(0);
+    }
+    
+    .menu-item.active {
+      background: linear-gradient(135deg, #2c2c3a 0%, #23232e 100%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .menu-item.active i {
+      color: #c084fc;
+      text-shadow: 0 0 4px rgba(192,132,252,0.3);
+    }
+    .menu-item.active span {
+      color: #f4f4f5;
+      font-weight: 500;
+    }
+
+    #toggle-btn-top, #toggle-btn-bottom {
+      transition: all 0.2s;
+      cursor: pointer;
+      border-radius: 16px;
+    }
+    
+    #toggle-btn-bottom {
+      background: linear-gradient(135deg, #2c2c3a 0%, #27272a 100%);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    
+    #toggle-btn-bottom:hover {
+      background: linear-gradient(135deg, #3a3a4a 0%, #32323e 100%);
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Кнопки экспорта/импорта */
+    .data-action-btn {
+      transition: all 0.2s;
+      border-radius: 16px;
+    }
+    .data-action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    /* ВЫПАДАЮЩИЙ СПИСОК — полностью закругленный, без влияния темы */
+    .section-select-custom {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23999' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-position: right 16px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      border-radius: 24px !important;
+    }
+    
+    /* Фиксируем стили для select в любой теме */
+    select.section-select-custom,
+    select#section-select {
+      border-radius: 24px;
+      background-color: rgb(24 24 27) !important;
+      color: rgb(212 212 216) !important;
+      border: 1px solid rgb(63 63 70) !important;
+    }
+    
+    html.light select#section-select {
+      background-color: rgb(39 39 42) !important;
+      color: rgb(228 228 231) !important;
+      border: 1px solid rgb(82 82 91) !important;
+    }
+    
+    /* Стили для опций select */
+    select#section-select option {
+      background-color: rgb(24 24 27);
+      color: rgb(212 212 216);
+      border-radius: 16px;
+    }
+    
+    html.light select#section-select option {
+      background-color: rgb(39 39 42);
+      color: rgb(228 228 231);
+    }
+
+    textarea {
+      resize: none;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .content-card {
+      transition: transform 0.1s ease, border-color 0.2s;
+      border-radius: 24px;
+    }
+    .content-card:hover {
+      border-color: #8b5cf6;
+      transform: translateY(-2px);
+    }
+
+    /* Анимация для уведомлений */
+    .toast-notification {
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* тёмная/светлая тема */
+    html.dark body {
+      background-color: #09090b;
+    }
+    html.light body {
+      background-color: #f4f4f9;
+    }
+    html.light .bg-zinc-950 {
+      background-color: #ffffff !important;
+    }
+    html.light .bg-zinc-900 {
+      background-color: #f0f0f5 !important;
+    }
+    html.light .border-zinc-700 {
+      border-color: #d4d4d8 !important;
+    }
+    html.light .text-zinc-300, 
+    html.light .text-zinc-400,
+    html.light .text-zinc-500 {
+      color: #3f3f46;
+    }
+    html.light .text-zinc-100 {
+      color: #18181b;
+    }
+    html.light #sidebar {
+      background-color: #fefefe;
+      border-right-color: #e4e4e7;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+    }
+    html.light .menu-item.active {
+      background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%);
+    }
+    html.light .menu-item.active i {
+      color: #7c3aed;
+    }
+    html.light .bg-zinc-800 {
+      background-color: #e4e4e9;
+    }
+    html.light #toggle-btn-bottom {
+      background: linear-gradient(135deg, #e8e8ef 0%, #dfdfe6 100%);
+      color: #1f1f2e;
+      border-color: rgba(124, 58, 237, 0.2);
+    }
+    html.light .bg-violet-600 {
+      background-color: #7c3aed;
+    }
+    
+    #sidebar::-webkit-scrollbar {
+      display: none;
+    }
+    #sidebar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    /* Стили для контейнера иконок в свернутом режиме */
+    .menu-item {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+  </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex overflow-hidden">
 
-    <!-- Шапка сайта -->
-    <header>
-        <h1>Название сайта</h1>
-        <p>Краткое описание</p>
-    </header>
+  <!-- БОКОВОЕ МЕНЮ -->
+  <div id="sidebar" class="w-16 bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50 sidebar-collapsed" style="width: 64px; overflow-y: hidden; border-top-right-radius: 32px; border-bottom-right-radius: 32px;">
 
-    <!-- Навигация -->
-    <nav>
-        <a href="#">Главная</a> |
-        <a href="#">О нас</a> |
-        <a href="#">Услуги</a> |
-        <a href="#">Контакты</a>
-    </nav>
-
-    <!-- Основная структура: колонки -->
-    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-        
-        <!-- Основной контент -->
-        <main style="flex: 3;">
-            <h2>Заголовок раздела</h2>
-            <p>Здесь основное содержимое страницы. Вы можете размещать текст, изображения, списки и другие элементы.</p>
-            
-            <h3>Подзаголовок</h3>
-            <ul>
-                <li>Пункт 1</li>
-                <li>Пункт 2</li>
-                <li>Пункт 3</li>
-            </ul>
-        </main>
-        
-        <!-- Боковая колонка -->
-        <aside style="flex: 1;">
-            <h3>Боковая панель</h3>
-            <p>Дополнительная информация, ссылки, реклама и т.д.</p>
-        </aside>
-        
+    <div class="p-5 flex items-center justify-between border-b border-zinc-700/50" style="border-top-right-radius: 32px;">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div class="w-8 h-8 bg-gradient-to-br from-white to-gray-200 rounded-2xl flex items-center justify-center text-black font-bold text-xl shadow-md">M</div>
+        <span id="logo-text" class="text-xl font-semibold tracking-tight whitespace-nowrap opacity-0 transition-opacity duration-200">MyGit</span>
+      </div>
+      <button onclick="toggleSidebar()" id="toggle-btn-top"
+              class="text-zinc-300 hover:text-white p-2 rounded-xl hover:bg-zinc-800/80 transition-all duration-200 focus:outline-none">
+        <i class="fa-solid fa-chevron-right text-xl"></i>
+      </button>
     </div>
 
-    <!-- Подвал -->
-    <footer>
-        <p>&copy; 2026 Моя страница. Все права защищены.</p>
-    </footer>
+    <div class="flex-1 py-6 px-3 space-y-1.5">
+      <a href="#" onclick="switchSection('home'); setActiveMenu(this)" 
+         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
+        <i class="fa-solid fa-house w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Главная</span>
+      </a>
+      <a href="#" onclick="switchSection('books'); setActiveMenu(this)" 
+         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
+        <i class="fa-solid fa-book w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Книги</span>
+      </a>
+      <a href="#" onclick="switchSection('series'); setActiveMenu(this)" 
+         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
+        <i class="fa-solid fa-tv w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Сериалы</span>
+      </a>
+      <a href="#" onclick="switchSection('movies'); setActiveMenu(this)" 
+         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
+        <i class="fa-solid fa-film w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Кино</span>
+      </a>
+      <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this)" 
+         class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 transition-all duration-200">
+        <i class="fa-solid fa-heart w-6 h-6 flex items-center justify-center text-zinc-400 text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">WishList</span>
+      </a>
+    </div>
 
+    <div class="p-4 border-t border-zinc-700/50" style="border-bottom-right-radius: 32px;">
+      <button onclick="toggleSidebar()" id="toggle-btn-bottom"
+              class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl transition-all duration-200 text-sm font-medium group">
+        <i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i>
+        <span class="menu-text text-sm font-medium whitespace-nowrap opacity-0 transition-opacity">Свернуть меню</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <div class="flex-1 flex flex-col h-screen ml-16 transition-all duration-300" id="main-content">
+    <!-- Верхний хедер с кнопками экспорта/импорта -->
+    <div class="h-14 border-b border-zinc-700 flex items-center px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-3">
+      <button onclick="toggleSidebar()" id="toggle-btn-header" class="text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden">
+        <i class="fa-solid fa-bars text-2xl"></i>
+      </button>
+      <div id="header-title" class="text-xl font-medium tracking-tight ml-2 md:ml-0 flex-1">Главная</div>
+      
+      <!-- Кнопка экспорта данных -->
+      <button onclick="exportData()" class="text-zinc-400 hover:text-green-400 p-2 rounded-full transition-colors group relative" title="Экспорт в JSON">
+        <i class="fa-solid fa-download text-xl"></i>
+      </button>
+      
+      <!-- Кнопка импорта данных -->
+      <label for="import-file-input" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full transition-colors cursor-pointer group relative" title="Импорт из JSON">
+        <i class="fa-solid fa-upload text-xl"></i>
+      </label>
+      <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importData(this)">
+      
+      <button onclick="toggleTheme()" class="text-zinc-400 hover:text-white p-2 rounded-full transition-colors">
+        <i id="theme-icon-header" class="fa-solid fa-sun text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Центральная область -->
+    <div class="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto">
+      
+      <!-- Главный экран -->
+      <div id="home-screen" class="w-full max-w-2xl mt-6 md:mt-12">
+        <div class="text-center mb-8 md:mb-12">
+          <p class="text-3xl md:text-4xl font-light bg-gradient-to-r from-zinc-200 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p>
+          <p class="text-zinc-500 text-sm mt-2">Заметки, книги, фильмы — всё под рукой</p>
+        </div>
+
+        <div class="w-full">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 shadow-2xl transition-all gap-2">
+            <select id="section-select" 
+                    class="section-select-custom bg-transparent border-0 text-zinc-300 text-base font-medium px-5 py-4 rounded-2xl focus:outline-none cursor-pointer hover:bg-zinc-800 transition-colors sm:w-auto"
+                    style="border-radius: 24px !important; background-color: #27272a !important;">
+              <option value="books">📚 Книги</option>
+              <option value="series">📺 Сериалы</option>
+              <option value="movies">🎬 Кино</option>
+              <option value="wishlist">💖 WishList</option>
+            </select>
+
+            <div class="flex-1 relative">
+              <textarea id="input" rows="1"
+                class="w-full bg-transparent border-0 focus:outline-none text-base py-4 px-4 resize-none overflow-hidden placeholder-zinc-500"
+                placeholder="Название или идея..."></textarea>
+            </div>
+
+            <button onclick="sendMessage()" 
+                    class="bg-violet-600 hover:bg-violet-700 w-11 h-11 flex items-center justify-center rounded-2xl mx-1 transition-all active:scale-95">
+              <i class="fa-solid fa-paper-plane text-white text-lg"></i>
+            </button>
+          </div>
+          <p class="text-xs text-zinc-500 mt-3 text-center">Нажмите Enter, чтобы добавить</p>
+        </div>
+      </div>
+
+      <!-- Экран списков -->
+      <div id="section-screen" class="w-full max-w-3xl hidden mt-4">
+        <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+          <h2 id="content-title" class="text-2xl font-semibold text-zinc-200 border-l-4 border-violet-500 pl-4"></h2>
+          <button onclick="switchSection('home')" class="text-sm bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full transition-colors">
+            <i class="fa-solid fa-plus mr-1"></i> Добавить новое
+          </button>
+        </div>
+        <div id="content-list" class="space-y-4 pb-10"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Компонент уведомлений -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2"></div>
+
+  <script>
+    // --- СОСТОЯНИЯ ---
+    let isDark = true;
+    let currentSection = 'home';
+    let isCollapsed = true;
+
+    // --- ДАННЫЕ ИЗ LOCALSTORAGE ---
+    let data = {
+      books: JSON.parse(localStorage.getItem('books')) || [],
+      series: JSON.parse(localStorage.getItem('series')) || [],
+      movies: JSON.parse(localStorage.getItem('movies')) || [],
+      wishlist: JSON.parse(localStorage.getItem('wishlist')) || []
+    };
+
+    // --- ФУНКЦИЯ ДЛЯ ПОКАЗА УВЕДОМЛЕНИЙ ---
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
+      const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+      
+      toast.className = `${bgColor} text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 toast-notification`;
+      toast.style.minWidth = '200px';
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-lg"></i>
+        <span class="text-sm font-medium">${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // --- ЭКСПОРТ ДАННЫХ В JSON ---
+    function exportData() {
+      try {
+        const exportData = {
+          version: "1.0",
+          exportDate: new Date().toISOString(),
+          data: {
+            books: data.books,
+            series: data.series,
+            movies: data.movies,
+            wishlist: data.wishlist
+          }
+        };
+        
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mygit_backup_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('✅ Данные успешно экспортированы!', 'success');
+      } catch (error) {
+        console.error('Export error:', error);
+        showToast('❌ Ошибка при экспорте данных', 'error');
+      }
+    }
+
+    // --- ИМПОРТ ДАННЫХ ИЗ JSON ---
+    function importData(input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          
+          let newData = null;
+          
+          if (imported.version && imported.data && imported.data.books) {
+            newData = imported.data;
+          }
+          else if (imported.books && imported.series && imported.movies && imported.wishlist) {
+            newData = imported;
+          }
+          else {
+            throw new Error('Неверный формат файла');
+          }
+          
+          data.books = newData.books || [];
+          data.series = newData.series || [];
+          data.movies = newData.movies || [];
+          data.wishlist = newData.wishlist || [];
+          
+          localStorage.setItem('books', JSON.stringify(data.books));
+          localStorage.setItem('series', JSON.stringify(data.series));
+          localStorage.setItem('movies', JSON.stringify(data.movies));
+          localStorage.setItem('wishlist', JSON.stringify(data.wishlist));
+          
+          if (currentSection !== 'home') {
+            renderContent(currentSection);
+          }
+          
+          showToast(`📦 Импорт завершён! Загружено: ${data.books.length + data.series.length + data.movies.length + data.wishlist.length} записей`, 'success');
+          
+          input.value = '';
+        } catch (error) {
+          console.error('Import error:', error);
+          showToast('❌ Ошибка импорта: неверный формат JSON', 'error');
+          input.value = '';
+        }
+      };
+      
+      reader.onerror = function() {
+        showToast('❌ Ошибка при чтении файла', 'error');
+        input.value = '';
+      };
+      
+      reader.readAsText(file);
+    }
+
+    // --- ОСТАЛЬНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ ---
+    
+    function updateAllToggleVisuals() {
+      const topIcon = document.querySelector('#toggle-btn-top i');
+      const bottomIcon = document.querySelector('#bottom-toggle-icon');
+      const bottomSpan = document.querySelector('#toggle-btn-bottom .menu-text');
+      
+      if (topIcon) {
+        if (isCollapsed) {
+          topIcon.classList.remove('fa-chevron-left');
+          topIcon.classList.add('fa-chevron-right');
+        } else {
+          topIcon.classList.remove('fa-chevron-right');
+          topIcon.classList.add('fa-chevron-left');
+        }
+      }
+      
+      if (bottomIcon) {
+        if (isCollapsed) {
+          bottomIcon.classList.remove('fa-chevron-left');
+          bottomIcon.classList.add('fa-chevron-right');
+        } else {
+          bottomIcon.classList.remove('fa-chevron-right');
+          bottomIcon.classList.add('fa-chevron-left');
+        }
+      }
+      
+      if (bottomSpan) {
+        bottomSpan.textContent = isCollapsed ? 'Развернуть меню' : 'Свернуть меню';
+      }
+    }
+    
+    // Функция обновления класса для центрирования иконок
+    function updateSidebarCollapsedClass() {
+      const sidebar = document.getElementById('sidebar');
+      if (isCollapsed) {
+        sidebar.classList.add('sidebar-collapsed');
+        // В свернутом режиме убираем отступы у пунктов меню и центрируем
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+          item.style.justifyContent = 'center';
+          item.style.paddingLeft = '0';
+          item.style.paddingRight = '0';
+        });
+      } else {
+        sidebar.classList.remove('sidebar-collapsed');
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+          item.style.justifyContent = 'flex-start';
+          item.style.paddingLeft = '16px';
+          item.style.paddingRight = '16px';
+        });
+      }
+    }
+
+    function toggleSidebar() {
+      isCollapsed = !isCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const logoText = document.getElementById('logo-text');
+      const menuTexts = document.querySelectorAll('.menu-text');
+      const mainContent = document.getElementById('main-content');
+      
+      if (!sidebar) return;
+      
+      if (isCollapsed) {
+        sidebar.style.width = '64px';
+        if (mainContent) mainContent.style.marginLeft = '64px';
+        logoText?.classList.add('opacity-0');
+        menuTexts.forEach(text => text.classList.add('opacity-0'));
+      } else {
+        sidebar.style.width = '260px';
+        if (mainContent) mainContent.style.marginLeft = '260px';
+        logoText?.classList.remove('opacity-0');
+        menuTexts.forEach(text => text.classList.remove('opacity-0'));
+      }
+      
+      updateSidebarCollapsedClass();
+      updateAllToggleVisuals();
+      
+      if (window.innerWidth < 768) {
+        if (!isCollapsed) {
+          sidebar.style.zIndex = '1000';
+        } else {
+          sidebar.style.zIndex = '50';
+        }
+      }
+    }
+
+    function setActiveMenu(element) {
+      document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+      if (element) element.classList.add('active');
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('input');
+      const select = document.getElementById('section-select');
+      if (!input.value.trim()) return;
+      
+      const text = input.value.trim();
+      const section = select.value;
+      
+      const newItem = {
+        id: Date.now(),
+        text: text,
+        date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+      };
+      
+      data[section].unshift(newItem);
+      localStorage.setItem(section, JSON.stringify(data[section]));
+      
+      if (currentSection === section) {
+        renderContent(section);
+      }
+      
+      input.value = '';
+      input.style.height = 'auto';
+      showToast(`➕ Добавлено в ${select.options[select.selectedIndex].text}`, 'success');
+    }
+
+    function renderContent(section) {
+      const container = document.getElementById('content-list');
+      const titleEl = document.getElementById('content-title');
+      const sectionScreen = document.getElementById('section-screen');
+      const homeScreen = document.getElementById('home-screen');
+      
+      const sectionNames = {
+        books: "📖 Книги",
+        series: "📺 Сериалы",
+        movies: "🎬 Кино",
+        wishlist: "❤️ WishList"
+      };
+      
+      titleEl.textContent = sectionNames[section] || section;
+      container.innerHTML = '';
+      
+      const items = data[section];
+      if (!items.length) {
+        container.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>Пока ничего нет. Добавьте первый элемент!</p></div>`;
+      } else {
+        items.forEach(item => {
+          const card = document.createElement('div');
+          card.className = "bg-zinc-900 border border-zinc-700 rounded-2xl p-5 content-card transition-all shadow-md";
+          card.innerHTML = `
+            <div class="flex justify-between items-start gap-3">
+              <p class="text-zinc-200 text-base leading-relaxed break-words flex-1">${escapeHtml(item.text)}</p>
+              <button onclick="deleteItem('${section}', ${item.id})" class="text-zinc-500 hover:text-red-400 transition-colors">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+            <p class="text-xs text-zinc-500 mt-3 flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ${item.date}</p>
+          `;
+          container.appendChild(card);
+        });
+      }
+      
+      homeScreen.classList.add('hidden');
+      sectionScreen.classList.remove('hidden');
+    }
+    
+    function escapeHtml(str) {
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+    
+    window.deleteItem = function(section, id) {
+      data[section] = data[section].filter(item => item.id !== id);
+      localStorage.setItem(section, JSON.stringify(data[section]));
+      if (currentSection === section) {
+        renderContent(section);
+      }
+      showToast(`🗑️ Элемент удалён`, 'info');
+    };
+    
+    function switchSection(section) {
+      currentSection = section;
+      const headerTitles = {
+        home: "🏠 Главная",
+        books: "📚 Книги",
+        series: "📺 Сериалы",
+        movies: "🎬 Кино",
+        wishlist: "💖 WishList"
+      };
+      const headerEl = document.getElementById('header-title');
+      if (headerEl) headerEl.textContent = headerTitles[section] || section;
+      
+      const homeScreen = document.getElementById('home-screen');
+      const sectionScreen = document.getElementById('section-screen');
+      
+      if (section === 'home') {
+        homeScreen.classList.remove('hidden');
+        sectionScreen.classList.add('hidden');
+        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+        const homeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => el.textContent.includes('Главная'));
+        if (homeMenuItem) homeMenuItem.classList.add('active');
+      } else {
+        renderContent(section);
+        const activeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => {
+          const span = el.querySelector('span');
+          return span && span.textContent.toLowerCase() === section;
+        });
+        if (activeMenuItem) setActiveMenu(activeMenuItem);
+      }
+    }
+    
+    function toggleTheme() {
+      isDark = !isDark;
+      const html = document.documentElement;
+      if (isDark) {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        const headerIcon = document.getElementById('theme-icon-header');
+        if (headerIcon) {
+          headerIcon.classList.remove('fa-moon');
+          headerIcon.classList.add('fa-sun');
+        }
+      } else {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        const headerIcon = document.getElementById('theme-icon-header');
+        if (headerIcon) {
+          headerIcon.classList.remove('fa-sun');
+          headerIcon.classList.add('fa-moon');
+        }
+      }
+    }
+    
+    const textarea = document.getElementById('input');
+    if (textarea) {
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+      });
+      textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+    }
+    
+    window.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('sidebar');
+      const mainContentDiv = document.getElementById('main-content');
+      if (sidebar) {
+        sidebar.style.width = '64px';
+        sidebar.style.overflowY = 'hidden';
+      }
+      if (mainContentDiv) mainContentDiv.style.marginLeft = '64px';
+      
+      document.querySelectorAll('.menu-text').forEach(t => t.classList.add('opacity-0'));
+      const logo = document.getElementById('logo-text');
+      if (logo) logo.classList.add('opacity-0');
+      
+      isCollapsed = true;
+      updateSidebarCollapsedClass();
+      updateAllToggleVisuals();
+      switchSection('home');
+      
+      const homeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => el.querySelector('span')?.textContent === 'Главная');
+      if (homeMenuItem) homeMenuItem.classList.add('active');
+    });
+  </script>
 </body>
 </html>
