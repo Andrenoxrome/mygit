@@ -3,230 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>MyGit — Трекер контента с рейтингом</title>
+  <title>MyGit — Продвинутый трекер контента</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-      background: #0a0a0f;
-      overflow-x: hidden;
-    }
-
-    #sidebar,
-    .menu-text,
-    #logo-text,
-    .menu-item i,
-    .menu-item span {
-      transition: all 0.2s ease-in-out;
-    }
-
-    #sidebar {
-      border-top-right-radius: 32px;
-      border-bottom-right-radius: 32px;
-      overflow-y: hidden !important; /* главное — убираем скролл */
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-      z-index: 1000;
-      transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #0a0a0f; overflow-x: hidden; }
+    #sidebar, .menu-text, #logo-text, .menu-item i, .menu-item span { transition: all 0.2s ease-in-out; }
+    #sidebar { border-top-right-radius: 32px; border-bottom-right-radius: 32px; overflow-y: hidden !important; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3); z-index: 1000; transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.3s ease; display: flex; flex-direction: column; }
+    #sidebar .flex-1 { overflow-y: visible; }
+    .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
+    body.sidebar-mobile-open .sidebar-overlay { opacity: 1; visibility: visible; }
+    .menu-item { border-radius: 20px; margin: 4px 0; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: flex-start; cursor: pointer; }
+    .sidebar-collapsed .menu-item { justify-content: center; padding: 12px 0 !important; }
+    .sidebar-collapsed .menu-item i { margin: 0 auto; }
+    .sidebar-collapsed .menu-item .menu-text { display: none; }
+    .menu-item:hover { transform: translateX(2px); background: #2c2c3a; }
+    .menu-item.active { background: linear-gradient(135deg, #2c2c3a 0%, #23232e 100%); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+    .menu-item.active i { color: #c084fc; text-shadow: 0 0 4px rgba(192,132,252,0.3); }
+    .rating-star { cursor: pointer; transition: transform 0.1s; }
+    .rating-star:hover { transform: scale(1.15); }
+    .rating-star-active { color: #fbbf24; }
+    .rating-star-inactive { color: #4a4a55; }
+    html.light .rating-star-inactive { color: #cbd5e1; }
+    .status-badge { padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; background: #2c2c3a; }
+    .tag { background: #3f3f46; padding: 2px 8px; border-radius: 16px; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; }
+    .tag:hover { background: #52525b; transform: scale(1.02); }
+    .tag-active { background: #8b5cf6; color: white; }
+    .modal { transition: opacity 0.2s ease; }
     
-    /* контент внутри сайдбара без скролла */
-    #sidebar .flex-1 {
-      overflow-y: visible;
-      overflow-x: visible;
-    }
-    
-    #sidebar .border-t {
-      overflow-y: visible;
-    }
-    
-    .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(3px);
-      z-index: 999;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s;
-    }
-    
-    body.sidebar-mobile-open .sidebar-overlay {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    .menu-item {
-      border-radius: 20px;
-      margin: 4px 0;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      position: relative;
-      cursor: pointer;
-    }
-    
-    .sidebar-collapsed .menu-item {
-      justify-content: center;
-      padding: 12px 0 !important;
-    }
-    
-    .sidebar-collapsed .menu-item i {
-      margin: 0 auto;
-    }
-    
-    .sidebar-collapsed .menu-item .menu-text {
-      display: none;
-    }
-    
-    .sidebar-collapsed .menu-item {
-      width: 100%;
-      justify-content: center;
-    }
-    
-    .menu-item:hover {
-      transform: translateX(2px);
-      background: #2c2c3a;
-    }
-    
-    .sidebar-collapsed .menu-item:hover {
-      transform: translateX(0);
-    }
-    
-    .menu-item.active {
-      background: linear-gradient(135deg, #2c2c3a 0%, #23232e 100%);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-    .menu-item.active i {
-      color: #c084fc;
-      text-shadow: 0 0 4px rgba(192,132,252,0.3);
-    }
-    .menu-item.active span {
-      color: #f4f4f5;
-      font-weight: 500;
-    }
-
-    #toggle-btn-top, #toggle-btn-bottom {
-      transition: all 0.2s;
-      cursor: pointer;
-      border-radius: 16px;
-    }
-    
-    #toggle-btn-bottom {
-      background: linear-gradient(135deg, #2c2c3a 0%, #27272a 100%);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      transition: all 0.2s;
-    }
-    
-    #toggle-btn-bottom:hover {
-      background: linear-gradient(135deg, #3a3a4a 0%, #32323e 100%);
-      border-color: rgba(139, 92, 246, 0.4);
-      transform: translateY(-1px);
-    }
-
-    .section-select-custom {
+    select, select:focus, select:active, select option { outline: none; }
+    select#section-select, select#edit-status {
+      background-color: rgb(39 39 42) !important;
+      color: rgb(228 228 231) !important;
+      border: 1px solid rgb(63 63 70) !important;
+      border-radius: 24px !important;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23999' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23a1a1aa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
       background-position: right 16px center;
       background-repeat: no-repeat;
       background-size: 16px;
-      border-radius: 24px !important;
-    }
-    
-    select.section-select-custom,
-    select#section-select {
-      border-radius: 24px;
-      background-color: rgb(24 24 27) !important;
-      color: rgb(212 212 216) !important;
-      border: 1px solid rgb(63 63 70) !important;
-    }
-    
-    html.light select#section-select {
-      background-color: rgb(39 39 42) !important;
-      color: rgb(228 228 231) !important;
-      border: 1px solid rgb(82 82 91) !important;
-    }
-    
-    textarea {
-      resize: none;
-      overflow-y: auto;
-      line-height: 1.5;
-      font-size: 16px;
-    }
-
-    .content-card {
-      transition: transform 0.1s ease, border-color 0.2s;
-      border-radius: 24px;
-    }
-    .content-card:hover {
-      border-color: #8b5cf6;
-      transform: translateY(-2px);
-    }
-
-    .toast-notification {
-      animation: slideIn 0.3s ease-out;
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .rating-star {
       cursor: pointer;
-      transition: transform 0.1s ease, color 0.1s;
-      font-size: 1rem;
     }
-    .rating-star:hover {
-      transform: scale(1.15);
+    html.light select#section-select, html.light select#edit-status {
+      background-color: rgb(244 244 245) !important;
+      color: rgb(24 24 27) !important;
+      border: 1px solid rgb(212 212 216) !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%233f3f46' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
     }
-    .rating-star-active {
-      color: #fbbf24;
-      text-shadow: 0 0 2px rgba(251,191,36,0.5);
-    }
-    .rating-star-inactive {
-      color: #4a4a55;
-    }
-    html.light .rating-star-inactive {
-      color: #cbd5e1;
-    }
-    
-    .stars-container {
-      display: inline-flex;
-      gap: 3px;
-      align-items: center;
-    }
-    .star-filled {
-      color: #fbbf24;
-    }
-    .star-empty {
-      color: #4a4a55;
-    }
-    html.light .star-empty {
-      color: #cbd5e1;
-    }
-
-    html.dark body { background-color: #09090b; }
-    html.light body { background-color: #f4f4f9; }
-    html.light .bg-zinc-950 { background-color: #ffffff !important; }
-    html.light .bg-zinc-900 { background-color: #f0f0f5 !important; }
-    html.light .border-zinc-700 { border-color: #d4d4d8 !important; }
-    html.light .text-zinc-300, .text-zinc-400, .text-zinc-500 { color: #3f3f46; }
-    html.light .text-zinc-100 { color: #18181b; }
-    html.light #sidebar { background-color: #fefefe; border-right-color: #e4e4e7; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05); }
-    html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
-    html.light .menu-item.active i { color: #7c3aed; }
-    html.light .bg-violet-600 { background-color: #7c3aed; }
     
     @media (max-width: 768px) {
-      #main-content { margin-left: 0 !important; transition: margin-left 0.3s; }
+      #main-content { margin-left: 0 !important; }
       #sidebar { transform: translateX(-100%); width: 260px !important; position: fixed; border-radius: 0 32px 32px 0; }
       body.sidebar-mobile-open #sidebar { transform: translateX(0); }
       .sidebar-overlay { display: block; }
@@ -235,437 +62,298 @@
       #logo-text { opacity: 1 !important; }
       #toggle-btn-top, #toggle-btn-bottom { display: none; }
       #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; }
-      #sidebar .menu-item i { margin: 0 16px 0 0 !important; }
+      .search-filter-container { flex-direction: column; align-items: stretch !important; }
     }
     @media (min-width: 769px) { .sidebar-overlay, .mobile-menu-toggle { display: none; } }
     .mobile-menu-toggle { background: transparent; border: none; cursor: pointer; }
-    @media (max-width: 640px) { .p-6 { padding: 1rem; } .text-3xl { font-size: 1.75rem; } }
+    #sidebar::-webkit-scrollbar { display: none; }
+    #sidebar { -ms-overflow-style: none; scrollbar-width: none; }
+    .content-card { transition: all 0.2s; border-radius: 24px; }
+    .content-card:hover { border-color: #8b5cf6; transform: translateY(-2px); }
+    .toast-notification { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    html.dark body { background-color: #09090b; }
+    html.light body { background-color: #f4f4f9; }
+    html.light .bg-zinc-950 { background-color: #ffffff !important; }
+    html.light .bg-zinc-900 { background-color: #f0f0f5 !important; }
+    html.light .border-zinc-700 { border-color: #d4d4d8 !important; }
+    html.light #sidebar { background-color: #fefefe; }
+    html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
+    html.light .bg-violet-600 { background-color: #7c3aed; }
+    html.light .status-badge { background: #e4e4e9; color: #18181b; }
+    html.light .tag { background: #d4d4d8; color: #18181b; }
+    html.light .tag-active { background: #7c3aed; color: white; }
     
-    /* Скрываем скролл у сайдбара полностью */
-    #sidebar::-webkit-scrollbar {
-      display: none;
+    .search-input {
+      transition: all 0.2s;
     }
-    #sidebar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+    .filter-tags-container {
+      max-height: 80px;
+      overflow-y: auto;
+      scrollbar-width: thin;
     }
   </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex overflow-hidden">
 
-  <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+<div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
-  <!-- БОКОВОЕ МЕНЮ - скролл убран -->
-  <div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px; overflow-y: hidden;">
-    <!-- Верхняя часть с логотипом и кнопкой свернуть/развернуть -->
-    <div class="p-5 flex items-center justify-between border-b border-zinc-700/50" style="border-top-right-radius: 32px;">
-      <div class="flex items-center gap-3 overflow-hidden">
-        <div class="w-8 h-8 bg-gradient-to-br from-white to-gray-200 rounded-2xl flex items-center justify-center text-black font-bold text-xl shadow-md">M</div>
-        <span id="logo-text" class="text-xl font-semibold tracking-tight whitespace-nowrap">MyGit</span>
-      </div>
-      <button onclick="toggleSidebarDesktop()" id="toggle-btn-top"
-              class="text-zinc-300 hover:text-white p-2 rounded-xl hover:bg-zinc-800/80 transition-all duration-200 focus:outline-none">
-        <i class="fa-solid fa-chevron-right text-xl"></i>
-      </button>
-    </div>
+<div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px; overflow-y: hidden;">
+  <div class="p-5 flex items-center justify-between border-b border-zinc-700/50">
+    <div class="flex items-center gap-3"><div class="w-8 h-8 bg-gradient-to-br from-white to-gray-200 rounded-2xl flex items-center justify-center text-black font-bold text-xl">M</div><span id="logo-text" class="text-xl font-semibold">MyGit</span></div>
+    <button onclick="toggleSidebarDesktop()" id="toggle-btn-top" class="text-zinc-300 hover:text-white p-2 rounded-xl"><i class="fa-solid fa-chevron-right text-xl"></i></button>
+  </div>
+  <div class="flex-1 py-6 px-3 space-y-1.5">
+    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Главная</span></a>
+    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Книги</span></a>
+    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Сериалы</span></a>
+    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">Кино</span></a>
+    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm">WishList</span></a>
+  </div>
+  <div class="p-4 border-t border-zinc-700/50">
+    <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl transition-all"><i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i><span id="bottom-toggle-text" class="menu-text text-sm">Свернуть меню</span></button>
+  </div>
+</div>
 
-    <!-- Меню (без скролла) -->
-    <div class="flex-1 py-6 px-3 space-y-1.5">
-      <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
-        <i class="fa-solid fa-house w-6 h-6 text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap">Главная</span>
-      </a>
-      <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
-        <i class="fa-solid fa-book w-6 h-6 text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap">Книги</span>
-      </a>
-      <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
-        <i class="fa-solid fa-tv w-6 h-6 text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap">Сериалы</span>
-      </a>
-      <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
-        <i class="fa-solid fa-film w-6 h-6 text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap">Кино</span>
-      </a>
-      <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800">
-        <i class="fa-solid fa-heart w-6 h-6 text-zinc-400 text-lg"></i>
-        <span class="menu-text text-sm font-medium whitespace-nowrap">WishList</span>
-      </a>
-    </div>
-
-    <!-- Нижняя кнопка: в свернутом состоянии только стрелка, в развернутом текст+стрелка -->
-    <div class="p-4 border-t border-zinc-700/50" style="border-bottom-right-radius: 32px;">
-      <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom"
-              class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl transition-all duration-200 text-sm font-medium group">
-        <i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i>
-        <span id="bottom-toggle-text" class="menu-text text-sm font-medium whitespace-nowrap">Свернуть меню</span>
-      </button>
-    </div>
+<div class="flex-1 flex flex-col h-screen ml-0 md:ml-16 transition-all duration-300" id="main-content">
+  <div class="h-14 border-b border-zinc-700 flex items-center px-4 md:px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-2">
+    <button onclick="toggleMobileSidebar()" class="mobile-menu-toggle text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden"><i class="fa-solid fa-bars text-2xl"></i></button>
+    <div id="header-title" class="text-xl font-medium tracking-tight flex-1 truncate">Главная</div>
+    <button onclick="exportData('json')" class="text-zinc-400 hover:text-green-400 p-2 rounded-full" title="Экспорт JSON"><i class="fa-solid fa-download text-xl"></i></button>
+    <button onclick="exportData('csv')" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full" title="Экспорт CSV"><i class="fa-solid fa-table text-xl"></i></button>
+    <button onclick="exportData('txt')" class="text-zinc-400 hover:text-yellow-400 p-2 rounded-full" title="Экспорт TXT"><i class="fa-solid fa-file-lines text-xl"></i></button>
+    <label for="import-file-input" class="text-zinc-400 hover:text-violet-400 p-2 rounded-full cursor-pointer"><i class="fa-solid fa-upload text-xl"></i></label>
+    <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importData(this)">
+    <button onclick="toggleTheme()" class="text-zinc-400 hover:text-white p-2 rounded-full"><i id="theme-icon-header" class="fa-solid fa-sun text-xl"></i></button>
   </div>
 
-  <div class="flex-1 flex flex-col h-screen ml-0 md:ml-16 transition-all duration-300" id="main-content">
-    <div class="h-14 border-b border-zinc-700 flex items-center px-4 md:px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-2">
-      <button onclick="toggleMobileSidebar()" class="mobile-menu-toggle text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden">
-        <i class="fa-solid fa-bars text-2xl"></i>
-      </button>
-      <div id="header-title" class="text-xl font-medium tracking-tight flex-1 truncate">Главная</div>
-      <button onclick="exportData()" class="text-zinc-400 hover:text-green-400 p-2 rounded-full transition-colors" title="Экспорт в JSON">
-        <i class="fa-solid fa-download text-xl"></i>
-      </button>
-      <label for="import-file-input" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full transition-colors cursor-pointer" title="Импорт из JSON">
-        <i class="fa-solid fa-upload text-xl"></i>
-      </label>
-      <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importData(this)">
-      <button onclick="toggleTheme()" class="text-zinc-400 hover:text-white p-2 rounded-full transition-colors">
-        <i id="theme-icon-header" class="fa-solid fa-sun text-xl"></i>
-      </button>
+  <div class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto">
+    <div id="home-screen" class="w-full max-w-2xl mt-4 md:mt-12">
+      <div class="text-center mb-6 md:mb-12"><p class="text-2xl md:text-4xl font-light bg-gradient-to-r from-zinc-200 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p><p class="text-zinc-500 text-xs md:text-sm mt-2">Книги, сериалы, кино — с рейтингом, тегами и прогрессом</p></div>
+      <div class="w-full">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 gap-2">
+          <select id="section-select" class="text-base font-medium px-4 py-3 focus:outline-none cursor-pointer" style="border-radius: 24px;">
+            <option value="books">📚 Книги</option><option value="series">📺 Сериалы</option><option value="movies">🎬 Кино</option><option value="wishlist">💖 WishList</option>
+          </select>
+          <div class="flex-1 relative"><textarea id="input" rows="1" class="w-full bg-transparent border-0 focus:outline-none text-base py-3 px-3 resize-none placeholder-zinc-500" placeholder="Название..."></textarea></div>
+          <button onclick="sendMessage()" class="bg-violet-600 hover:bg-violet-700 w-11 h-11 flex items-center justify-center rounded-2xl transition-all active:scale-95"><i class="fa-solid fa-paper-plane text-white"></i></button>
+        </div>
+        <p class="text-xs text-zinc-500 mt-3 text-center">Нажмите Enter, чтобы добавить</p>
+      </div>
     </div>
-
-    <div class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto">
-      <div id="home-screen" class="w-full max-w-2xl mt-4 md:mt-12">
-        <div class="text-center mb-6 md:mb-12">
-          <p class="text-2xl md:text-4xl font-light bg-gradient-to-r from-zinc-200 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p>
-          <p class="text-zinc-500 text-xs md:text-sm mt-2">Заметки, книги, фильмы — ставьте рейтинг!</p>
+    <div id="section-screen" class="w-full max-w-4xl hidden mt-4">
+      <!-- Панель поиска и фильтрации -->
+      <div class="search-filter-container mb-6 space-y-3">
+        <div class="relative">
+          <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i>
+          <input type="text" id="search-input" placeholder="Поиск по названию..." class="search-input w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-10 pr-4 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500 transition">
         </div>
-        <div class="w-full">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 shadow-2xl gap-2">
-            <select id="section-select" class="section-select-custom bg-transparent border-0 text-zinc-300 text-base font-medium px-4 py-3 rounded-2xl focus:outline-none cursor-pointer hover:bg-zinc-800 transition-colors sm:w-auto" style="background-color: #27272a !important;">
-              <option value="books">📚 Книги</option>
-              <option value="series">📺 Сериалы</option>
-              <option value="movies">🎬 Кино</option>
-              <option value="wishlist">💖 WishList</option>
-            </select>
-            <div class="flex-1 relative">
-              <textarea id="input" rows="1" class="w-full bg-transparent border-0 focus:outline-none text-base py-3 px-3 resize-none overflow-hidden placeholder-zinc-500" placeholder="Название или идея..."></textarea>
-            </div>
-            <button onclick="sendMessage()" class="bg-violet-600 hover:bg-violet-700 w-11 h-11 flex items-center justify-center rounded-2xl mx-1 transition-all active:scale-95 shrink-0">
-              <i class="fa-solid fa-paper-plane text-white text-lg"></i>
-            </button>
-          </div>
-          <p class="text-xs text-zinc-500 mt-3 text-center">Нажмите Enter, чтобы добавить</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-zinc-500"><i class="fa-regular fa-tags"></i> Фильтр по тегам:</span>
+          <div id="filter-tags-list" class="filter-tags-container flex flex-wrap gap-2 flex-1"></div>
+          <button onclick="clearFilters()" class="text-xs text-zinc-500 hover:text-red-400 transition px-2 py-1 rounded-lg hover:bg-zinc-800"><i class="fa-regular fa-times-circle"></i> Сбросить</button>
         </div>
       </div>
-
-      <div id="section-screen" class="w-full max-w-3xl hidden mt-4">
-        <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
-          <h2 id="content-title" class="text-xl md:text-2xl font-semibold text-zinc-200 border-l-4 border-violet-500 pl-4"></h2>
-          <button onclick="switchSection('home')" class="text-sm bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full transition-colors">
-            <i class="fa-solid fa-plus mr-1"></i> Добавить новое
-          </button>
-        </div>
-        <div id="content-list" class="space-y-4 pb-10"></div>
-      </div>
+      <div id="content-list" class="space-y-4 pb-10"></div>
     </div>
   </div>
+</div>
+<div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 z-[100] flex flex-col gap-2 w-full max-w-[90%] md:max-w-md"></div>
 
-  <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 z-[100] flex flex-col gap-2 w-full max-w-[90%] md:max-w-md"></div>
+<!-- Модальное окно редактирования -->
+<div id="edit-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[200] hidden transition-all" style="backdrop-filter: blur(4px);">
+  <div class="bg-zinc-900 rounded-3xl w-full max-w-lg mx-4 p-6 border border-zinc-700 shadow-2xl">
+    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2"><i class="fa-solid fa-pen"></i> Редактировать</h3>
+    <input type="text" id="edit-title" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400" placeholder="Название">
+    <input type="text" id="edit-tags" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400" placeholder="Теги (через запятую)">
+    <input type="text" id="edit-poster" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400" placeholder="URL обложки/постера">
+    <select id="edit-status" class="w-full p-3 mb-3 text-base rounded-xl cursor-pointer focus:outline-none" style="border-radius: 24px;">
+      <option value="planned">📅 В планах</option><option value="progress">⏳ В процессе</option><option value="completed">✅ Завершено</option><option value="abandoned">❌ Брошено</option>
+    </select>
+    <div class="flex gap-3 mb-4"><input type="number" id="edit-progress" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white placeholder-zinc-400" placeholder="Прогресс (сезон/серия/страница)" step="1"><span class="text-zinc-400 text-sm self-center">(число)</span></div>
+    <div class="flex gap-3"><button onclick="saveEdit()" class="flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-medium transition">Сохранить</button><button onclick="closeModal()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 py-3 rounded-xl transition">Отмена</button></div>
+  </div>
+</div>
 
-  <script>
-    let isDark = true;
-    let currentSection = 'home';
-    let isCollapsed = true;
+<script>
+  let currentEditItem = { section: null, id: null };
+  let isDark = true, currentSection = 'home', isCollapsed = true;
+  let currentSearchQuery = '';
+  let currentSelectedTag = null;
+  
+  let data = { books: [], series: [], movies: [], wishlist: [] };
+  ['books', 'series', 'movies', 'wishlist'].forEach(s => { data[s] = JSON.parse(localStorage.getItem(s)) || []; });
 
-    let data = {
-      books: JSON.parse(localStorage.getItem('books')) || [],
-      series: JSON.parse(localStorage.getItem('series')) || [],
-      movies: JSON.parse(localStorage.getItem('movies')) || [],
-      wishlist: JSON.parse(localStorage.getItem('wishlist')) || []
-    };
+  function showToast(msg, type='success'){ const c=document.getElementById('toast-container'), t=document.createElement('div'), bg={success:'bg-green-600',error:'bg-red-600',info:'bg-blue-600'}[type]; t.className=`${bg} text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 toast-notification`; t.innerHTML=`<i class="fa-solid ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle'}"></i><span>${msg}</span>`; c.appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(20px)';setTimeout(()=>t.remove(),300);},2500); }
 
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
-      const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
-      toast.className = `${bgColor} text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 toast-notification`;
-      toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span class="text-sm font-medium break-words">${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-      }, 2500);
-    }
+  function openEdit(section, id){ 
+    let item=data[section].find(i=>i.id==id); 
+    if(item){ 
+      currentEditItem={section,id}; 
+      document.getElementById('edit-title').value=item.text||''; 
+      document.getElementById('edit-tags').value=(item.tags||[]).join(', '); 
+      document.getElementById('edit-poster').value=item.posterUrl||''; 
+      document.getElementById('edit-status').value=item.status||'planned'; 
+      document.getElementById('edit-progress').value=item.progress||0; 
+      document.getElementById('edit-modal').classList.remove('hidden');
+      if(window.innerWidth <= 768) closeMobileSidebar();
+    } 
+  }
+  function closeModal(){ document.getElementById('edit-modal').classList.add('hidden'); }
+  function saveEdit(){ let {section,id}=currentEditItem; let item=data[section].find(i=>i.id==id); if(item){ item.text=document.getElementById('edit-title').value; let tagsStr=document.getElementById('edit-tags').value; item.tags=tagsStr?tagsStr.split(',').map(t=>t.trim()).filter(t=>t):[]; item.posterUrl=document.getElementById('edit-poster').value; item.status=document.getElementById('edit-status').value; item.progress=parseInt(document.getElementById('edit-progress').value)||0; localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); showToast('✏️ Запись обновлена','success'); closeModal(); } }
 
-    function updateItemRating(section, itemId, newRating) {
-      const item = data[section].find(i => i.id === itemId);
-      if (item) {
-        item.rating = newRating;
-        localStorage.setItem(section, JSON.stringify(data[section]));
-        if (currentSection === section) renderContent(section);
-        showToast(`⭐ Рейтинг изменён на ${newRating}`, 'success');
+  function exportData(format){ let allItems=[]; ['books','series','movies','wishlist'].forEach(cat=>{ data[cat].forEach(item=>{ allItems.push({category:cat,title:item.text,date:item.date,rating:item.rating||0,tags:(item.tags||[]).join(', '),status:item.status||'planned',progress:item.progress||0,poster:item.posterUrl||''}); }); });
+    if(format==='json'){ let blob=new Blob([JSON.stringify({version:"2.1",exportDate:new Date(),data:data},null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.json`; a.click(); URL.revokeObjectURL(a.href); showToast('✅ JSON экспортирован'); }
+    else if(format==='csv'){ let headers=['Категория','Название','Дата','Рейтинг','Теги','Статус','Прогресс','Постер']; let rows=[headers]; allItems.forEach(i=>rows.push([i.category,i.title,i.date,i.rating,i.tags,i.status,i.progress,i.poster])); let csv=rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n'); let blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href); showToast('📊 CSV экспортирован'); }
+    else if(format==='txt'){ let txt='=== MYGIT ТРЕКЕР КОНТЕНТА ===\n\n'; allItems.forEach(i=>{ txt+=`[${i.category.toUpperCase()}] ${i.title}\n   Дата: ${i.date} | Рейтинг: ${i.rating}⭐ | Статус: ${i.status} | Прогресс: ${i.progress}\n   Теги: ${i.tags||'нет'} | Постер: ${i.poster||'нет'}\n\n`; }); let blob=new Blob([txt],{type:'text/plain'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.txt`; a.click(); URL.revokeObjectURL(a.href); showToast('📄 TXT экспортирован'); }
+  }
+
+  function importData(input){ let file=input.files[0]; if(!file) return; let reader=new FileReader(); reader.onload=e=>{ try{ let imported=JSON.parse(e.target.result); let newData=imported.data||imported; if(newData.books&&newData.series&&newData.movies&&newData.wishlist) data=newData; else throw new Error(); ['books','series','movies','wishlist'].forEach(s=>{ localStorage.setItem(s,JSON.stringify(data[s]||[])); if(!data[s]) data[s]=[]; }); if(currentSection!=='home') renderContent(currentSection); showToast('📦 Импорт успешен'); input.value=''; }catch(err){ showToast('Ошибка импорта','error'); input.value=''; } }; reader.readAsText(file); }
+
+  function sendMessage(){ let input=document.getElementById('input'), select=document.getElementById('section-select'); if(!input.value.trim()) return; let text=input.value.trim(), section=select.value; let newItem={id:Date.now(),text:text,date:new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}),rating:0,tags:[],posterUrl:'',status:'planned',progress:0}; data[section].unshift(newItem); localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); input.value=''; input.style.height='auto'; showToast(`➕ Добавлено в ${select.options[select.selectedIndex].text}`); }
+
+  function updateRating(section,id,newRating){ let item=data[section].find(i=>i.id===id); if(item){ item.rating=newRating; localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); showToast(`⭐ Рейтинг: ${newRating}`); } }
+
+  function getUniqueTagsFromItems(items){
+    let tagsSet = new Set();
+    items.forEach(item => {
+      if(item.tags && Array.isArray(item.tags)){
+        item.tags.forEach(tag => tagsSet.add(tag));
       }
-    }
-
-    function exportData() {
-      try {
-        const exportData = { version: "1.1", exportDate: new Date().toISOString(), data: { books: data.books, series: data.series, movies: data.movies, wishlist: data.wishlist } };
-        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `mygit_backup_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('✅ Данные успешно экспортированы!', 'success');
-      } catch (error) { showToast('❌ Ошибка при экспорте', 'error'); }
-    }
-
-    function importData(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          let newData = null;
-          if (imported.version && imported.data && imported.data.books) newData = imported.data;
-          else if (imported.books && imported.series && imported.movies && imported.wishlist) newData = imported;
-          else throw new Error('Неверный формат');
-          
-          data.books = newData.books || [];
-          data.series = newData.series || [];
-          data.movies = newData.movies || [];
-          data.wishlist = newData.wishlist || [];
-          
-          localStorage.setItem('books', JSON.stringify(data.books));
-          localStorage.setItem('series', JSON.stringify(data.series));
-          localStorage.setItem('movies', JSON.stringify(data.movies));
-          localStorage.setItem('wishlist', JSON.stringify(data.wishlist));
-          if (currentSection !== 'home') renderContent(currentSection);
-          showToast(`📦 Импорт завершён!`, 'success');
-          input.value = '';
-        } catch (error) { showToast('❌ Ошибка импорта: неверный JSON', 'error'); input.value = ''; }
-      };
-      reader.onerror = () => { showToast('❌ Ошибка чтения файла', 'error'); input.value = ''; };
-      reader.readAsText(file);
-    }
-
-    function sendMessage() {
-      const input = document.getElementById('input');
-      const select = document.getElementById('section-select');
-      if (!input.value.trim()) return;
-      const text = input.value.trim();
-      const section = select.value;
-      const newItem = { 
-        id: Date.now(), 
-        text: text, 
-        date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }),
-        rating: 0 
-      };
-      data[section].unshift(newItem);
-      localStorage.setItem(section, JSON.stringify(data[section]));
-      if (currentSection === section) renderContent(section);
-      input.value = '';
-      input.style.height = 'auto';
-      showToast(`➕ Добавлено в ${select.options[select.selectedIndex].text}`, 'success');
-    }
-
-    function renderContent(section) {
-      const container = document.getElementById('content-list');
-      const titleEl = document.getElementById('content-title');
-      const sectionScreen = document.getElementById('section-screen');
-      const homeScreen = document.getElementById('home-screen');
-      const sectionNames = { books: "📖 Книги", series: "📺 Сериалы", movies: "🎬 Кино", wishlist: "❤️ WishList" };
-      titleEl.textContent = sectionNames[section] || section;
-      container.innerHTML = '';
-      const items = data[section];
-      if (!items.length) {
-        container.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>Пока ничего нет. Добавьте первый элемент!</p></div>`;
-      } else {
-        items.forEach(item => {
-          const rating = item.rating || 0;
-          const card = document.createElement('div');
-          card.className = "bg-zinc-900 border border-zinc-700 rounded-2xl p-4 md:p-5 content-card transition-all shadow-md";
-          
-          const starsDiv = document.createElement('div');
-          starsDiv.className = 'flex items-center gap-2 mt-2 pt-1 border-t border-zinc-800/50';
-          const starsLabel = document.createElement('span');
-          starsLabel.className = 'text-xs text-zinc-500 mr-1';
-          starsLabel.textContent = 'Рейтинг:';
-          const starsContainer = document.createElement('div');
-          starsContainer.className = 'stars-container';
-          
-          for (let i = 1; i <= 5; i++) {
-            const star = document.createElement('i');
-            star.className = `fa-${i <= rating ? 'solid' : 'regular'} fa-star rating-star ${i <= rating ? 'rating-star-active' : 'rating-star-inactive'}`;
-            star.style.fontSize = '0.85rem';
-            star.style.cursor = 'pointer';
-            star.style.marginRight = '2px';
-            star.addEventListener('click', (e) => {
-              e.stopPropagation();
-              updateItemRating(section, item.id, i);
-            });
-            starsContainer.appendChild(star);
-          }
-          starsDiv.appendChild(starsLabel);
-          starsDiv.appendChild(starsContainer);
-          
-          const ratingTextSpan = document.createElement('span');
-          ratingTextSpan.className = 'text-xs text-zinc-400 ml-2';
-          ratingTextSpan.textContent = rating > 0 ? `(${rating})` : 'нет оценки';
-          starsDiv.appendChild(ratingTextSpan);
-          
-          card.innerHTML = `
-            <div class="flex justify-between items-start gap-3">
-              <p class="text-zinc-200 text-sm md:text-base leading-relaxed break-words flex-1">${escapeHtml(item.text)}</p>
-              <button onclick="deleteItem('${section}', ${item.id})" class="text-zinc-500 hover:text-red-400 transition-colors shrink-0">
-                <i class="fa-regular fa-trash-can"></i>
-              </button>
-            </div>
-            <p class="text-xs text-zinc-500 mt-2 flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ${item.date}</p>
-          `;
-          card.appendChild(starsDiv);
-          container.appendChild(card);
-        });
-      }
-      homeScreen.classList.add('hidden');
-      sectionScreen.classList.remove('hidden');
-    }
-    
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-    
-    window.deleteItem = function(section, id) {
-      data[section] = data[section].filter(item => item.id !== id);
-      localStorage.setItem(section, JSON.stringify(data[section]));
-      if (currentSection === section) renderContent(section);
-      showToast(`🗑️ Элемент удалён`, 'info');
-    };
-    
-    function switchSection(section) {
-      currentSection = section;
-      const headerTitles = { home: "🏠 Главная", books: "📚 Книги", series: "📺 Сериалы", movies: "🎬 Кино", wishlist: "💖 WishList" };
-      document.getElementById('header-title').textContent = headerTitles[section] || section;
-      const homeScreen = document.getElementById('home-screen');
-      const sectionScreen = document.getElementById('section-screen');
-      if (section === 'home') {
-        homeScreen.classList.remove('hidden');
-        sectionScreen.classList.add('hidden');
-        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-        const homeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => el.textContent.includes('Главная'));
-        if (homeMenuItem) homeMenuItem.classList.add('active');
-      } else {
-        renderContent(section);
-        const activeMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(el => { const span = el.querySelector('span'); return span && span.textContent.toLowerCase() === section; });
-        if (activeMenuItem) setActiveMenu(activeMenuItem);
-      }
-      closeMobileSidebar();
-    }
-    
-    function setActiveMenu(element) {
-      document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-      if (element) element.classList.add('active');
-    }
-    
-    function toggleTheme() {
-      isDark = !isDark;
-      const html = document.documentElement;
-      if (isDark) {
-        html.classList.remove('light');
-        html.classList.add('dark');
-        const icon = document.getElementById('theme-icon-header');
-        if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
-      } else {
-        html.classList.remove('dark');
-        html.classList.add('light');
-        const icon = document.getElementById('theme-icon-header');
-        if (icon) { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
-      }
-    }
-    
-    function updateBottomButtonState() {
-      const bottomText = document.getElementById('bottom-toggle-text');
-      const bottomIcon = document.getElementById('bottom-toggle-icon');
-      if (!bottomText || !bottomIcon) return;
-      if (isCollapsed) {
-        bottomText.style.display = 'none';
-        bottomIcon.className = 'fa-solid fa-chevron-right text-lg';
-      } else {
-        bottomText.style.display = 'inline-block';
-        bottomIcon.className = 'fa-solid fa-chevron-left text-lg';
-      }
-    }
-    
-    function toggleSidebarDesktop() {
-      if (window.innerWidth <= 768) return;
-      isCollapsed = !isCollapsed;
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('main-content');
-      const topIcon = document.querySelector('#toggle-btn-top i');
-      
-      if (isCollapsed) {
-        sidebar.style.width = '64px';
-        main.style.marginLeft = '64px';
-        sidebar.classList.add('sidebar-collapsed');
-        document.querySelectorAll('.menu-item').forEach(item => { 
-          item.style.justifyContent = 'center'; 
-          item.style.paddingLeft = '0'; 
-          item.style.paddingRight = '0'; 
-        });
-        if (topIcon) topIcon.className = 'fa-solid fa-chevron-right text-xl';
-      } else {
-        sidebar.style.width = '260px';
-        main.style.marginLeft = '260px';
-        sidebar.classList.remove('sidebar-collapsed');
-        document.querySelectorAll('.menu-item').forEach(item => { 
-          item.style.justifyContent = 'flex-start'; 
-          item.style.paddingLeft = '16px'; 
-          item.style.paddingRight = '16px'; 
-        });
-        if (topIcon) topIcon.className = 'fa-solid fa-chevron-left text-xl';
-      }
-      updateBottomButtonState();
-    }
-    
-    function toggleMobileSidebar() { document.body.classList.toggle('sidebar-mobile-open'); }
-    function closeMobileSidebar() { document.body.classList.remove('sidebar-mobile-open'); }
-    
-    const textarea = document.getElementById('input');
-    if (textarea) {
-      textarea.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 160) + 'px'; });
-      textarea.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-    }
-    
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.innerWidth > 768) {
-        const sidebar = document.getElementById('sidebar');
-        const main = document.getElementById('main-content');
-        sidebar.style.width = '64px';
-        main.style.marginLeft = '64px';
-        sidebar.classList.add('sidebar-collapsed');
-        isCollapsed = true;
-        document.querySelectorAll('.menu-item').forEach(item => { 
-          item.style.justifyContent = 'center'; 
-          item.style.paddingLeft = '0'; 
-          item.style.paddingRight = '0'; 
-        });
-        const topIcon = document.querySelector('#toggle-btn-top i');
-        if (topIcon) topIcon.className = 'fa-solid fa-chevron-right text-xl';
-        updateBottomButtonState();
-      } else {
-        document.getElementById('main-content').style.marginLeft = '0px';
-        const bottomText = document.getElementById('bottom-toggle-text');
-        if (bottomText) bottomText.style.display = 'inline-block';
-      }
-      switchSection('home');
-      window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-          document.body.classList.remove('sidebar-mobile-open');
-          if (isCollapsed) {
-            document.getElementById('sidebar').style.width = '64px';
-            document.getElementById('main-content').style.marginLeft = '64px';
-          } else {
-            document.getElementById('sidebar').style.width = '260px';
-            document.getElementById('main-content').style.marginLeft = '260px';
-          }
-        } else {
-          document.getElementById('main-content').style.marginLeft = '0px';
-        }
-      });
     });
-  </script>
+    return Array.from(tagsSet).sort();
+  }
+
+  function updateFilterTagsList(items){
+    const container = document.getElementById('filter-tags-list');
+    if(!container) return;
+    const uniqueTags = getUniqueTagsFromItems(items);
+    if(uniqueTags.length === 0){
+      container.innerHTML = '<span class="text-xs text-zinc-500">Нет тегов</span>';
+      return;
+    }
+    container.innerHTML = uniqueTags.map(tag => `
+      <span class="tag ${currentSelectedTag === tag ? 'tag-active' : ''}" onclick="filterByTag('${escapeHtml(tag).replace(/'/g, "\\'")}')">
+        <i class="fa-regular fa-hashtag"></i>${escapeHtml(tag)}
+      </span>
+    `).join('');
+  }
+
+  function filterByTag(tag){
+    if(currentSelectedTag === tag){
+      currentSelectedTag = null;
+    } else {
+      currentSelectedTag = tag;
+    }
+    renderContent(currentSection);
+  }
+
+  function clearFilters(){
+    currentSearchQuery = '';
+    currentSelectedTag = null;
+    document.getElementById('search-input').value = '';
+    renderContent(currentSection);
+    showToast('Фильтры сброшены', 'info');
+  }
+
+  function filterItems(items){
+    let filtered = [...items];
+    if(currentSearchQuery){
+      const query = currentSearchQuery.toLowerCase();
+      filtered = filtered.filter(item => item.text.toLowerCase().includes(query));
+    }
+    if(currentSelectedTag){
+      filtered = filtered.filter(item => item.tags && item.tags.includes(currentSelectedTag));
+    }
+    return filtered;
+  }
+
+  function renderContent(section){ 
+    let container=document.getElementById('content-list'); 
+    if(!container) return; 
+    let items=data[section]; 
+    let filteredItems = filterItems(items);
+    
+    updateFilterTagsList(items);
+    
+    container.innerHTML=''; 
+    if(!filteredItems.length){ 
+      let message = '';
+      if(currentSearchQuery || currentSelectedTag) message = 'Нет записей по выбранным фильтрам';
+      else message = 'Пока ничего нет. Добавьте первый элемент!';
+      container.innerHTML=`<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>${message}</p>${(currentSearchQuery || currentSelectedTag) ? '<button onclick="clearFilters()" class="text-sm text-violet-400 hover:text-violet-300 mt-2">Сбросить фильтры</button>' : ''}</div>`; 
+      return; 
+    }
+    filteredItems.forEach(item=>{ 
+      let rating=item.rating||0; 
+      let statusMap={planned:'📅 В планах',progress:'⏳ В процессе',completed:'✅ Завершено',abandoned:'❌ Брошено'}; 
+      let statusText=statusMap[item.status]||'📅 В планах'; 
+      let progressText=item.progress?` (${item.progress})`:''; 
+      let tagsHtml=(item.tags||[]).map(t=>`<span class="tag"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('');
+      let posterHtml=item.posterUrl?`<img src="${escapeHtml(item.posterUrl)}" class="w-12 h-16 object-cover rounded-lg shadow-md" onerror="this.style.display='none'" loading="lazy">`:`<div class="w-12 h-16 bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-regular fa-image text-zinc-500 text-xl"></i></div>`;
+      let card=document.createElement('div'); card.className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 content-card transition-all shadow-md";
+      card.innerHTML=`<div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p><div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${[1,2,3,4,5].map(i=>`<i class="fa-${i<=rating?'solid':'regular'} fa-star rating-star ${i<=rating?'rating-star-active':'rating-star-inactive'}" style="cursor:pointer;font-size:0.9rem" onclick="updateRating('${section}',${item.id},${i})"></i>`).join('')}</div><span class="status-badge">${statusText}${progressText}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div>`;
+      container.appendChild(card);
+    });
+    document.getElementById('home-screen')?.classList.add('hidden'); 
+    document.getElementById('section-screen')?.classList.remove('hidden');
+    let titleMap={books:"📖 Книги",series:"📺 Сериалы",movies:"🎬 Кино",wishlist:"❤️ WishList"}; 
+    let filterInfo = '';
+    if(currentSearchQuery) filterInfo += ` 🔍 "${currentSearchQuery}"`;
+    if(currentSelectedTag) filterInfo += ` 🏷️ #${currentSelectedTag}`;
+    document.getElementById('content-title')? document.getElementById('content-title').innerHTML=titleMap[section]+` <span class="text-sm text-zinc-500">(${filteredItems.length}/${items.length})</span>${filterInfo ? `<span class="text-xs text-violet-400 ml-2">${filterInfo}</span>` : ''}`:null;
+  }
+
+  function deleteItem(section,id){ data[section]=data[section].filter(i=>i.id!==id); localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); showToast('🗑️ Удалено','info'); }
+  
+  function switchSection(section){ 
+    currentSection=section; 
+    currentSearchQuery = '';
+    currentSelectedTag = null;
+    if(document.getElementById('search-input')) document.getElementById('search-input').value = '';
+    let titles={home:"🏠 Главная",books:"📚 Книги",series:"📺 Сериалы",movies:"🎬 Кино",wishlist:"💖 WishList"}; 
+    document.getElementById('header-title').innerText=titles[section]; 
+    if(section==='home'){ 
+      document.getElementById('home-screen')?.classList.remove('hidden'); 
+      document.getElementById('section-screen')?.classList.add('hidden'); 
+    } else { 
+      renderContent(section); 
+      document.getElementById('home-screen')?.classList.add('hidden'); 
+      document.getElementById('section-screen')?.classList.remove('hidden'); 
+    } 
+    closeMobileSidebar(); 
+  }
+  
+  function setActiveMenu(el){ document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active'); }
+  function toggleTheme(){ isDark=!isDark; let html=document.documentElement; if(isDark){ html.classList.remove('light'); html.classList.add('dark'); document.getElementById('theme-icon-header')?.classList.replace('fa-moon','fa-sun'); } else { html.classList.remove('dark'); html.classList.add('light'); document.getElementById('theme-icon-header')?.classList.replace('fa-sun','fa-moon'); } }
+  function toggleSidebarDesktop(){ if(window.innerWidth<=768) return; isCollapsed=!isCollapsed; let sidebar=document.getElementById('sidebar'),main=document.getElementById('main-content'),topIcon=document.querySelector('#toggle-btn-top i'),bottomIcon=document.getElementById('bottom-toggle-icon'),bottomText=document.getElementById('bottom-toggle-text'); if(isCollapsed){ sidebar.style.width='64px'; main.style.marginLeft='64px'; sidebar.classList.add('sidebar-collapsed'); document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='center';i.style.paddingLeft='0';i.style.paddingRight='0';}); if(topIcon) topIcon.className='fa-solid fa-chevron-right text-xl'; if(bottomText) bottomText.style.display='none'; if(bottomIcon) bottomIcon.className='fa-solid fa-chevron-right text-lg'; } else { sidebar.style.width='260px'; main.style.marginLeft='260px'; sidebar.classList.remove('sidebar-collapsed'); document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='flex-start';i.style.paddingLeft='16px';i.style.paddingRight='16px';}); if(topIcon) topIcon.className='fa-solid fa-chevron-left text-xl'; if(bottomText) bottomText.style.display='inline-block'; if(bottomIcon) bottomIcon.className='fa-solid fa-chevron-left text-lg'; } }
+  function toggleMobileSidebar(){ document.body.classList.toggle('sidebar-mobile-open'); }
+  function closeMobileSidebar(){ document.body.classList.remove('sidebar-mobile-open'); }
+  function escapeHtml(str){ return String(str).replace(/[&<>]/g,function(m){if(m==='&') return '&amp;';if(m==='<') return '&lt;';if(m==='>') return '&gt;';return m;}); }
+  
+  let textarea=document.getElementById('input'); 
+  if(textarea){ 
+    textarea.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,160)+'px';}); 
+    textarea.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}); 
+  }
+  
+  let searchInput = document.getElementById('search-input');
+  if(searchInput){
+    searchInput.addEventListener('input', (e) => {
+      currentSearchQuery = e.target.value;
+      if(currentSection !== 'home') renderContent(currentSection);
+    });
+  }
+  
+  window.addEventListener('DOMContentLoaded',()=>{ 
+    if(window.innerWidth>768){ 
+      let s=document.getElementById('sidebar'),m=document.getElementById('main-content'); 
+      s.style.width='64px'; m.style.marginLeft='64px'; s.classList.add('sidebar-collapsed'); isCollapsed=true; 
+      document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='center';i.style.paddingLeft='0';i.style.paddingRight='0';}); 
+      let bt=document.getElementById('bottom-toggle-text'); if(bt) bt.style.display='none'; 
+    } 
+    switchSection('home'); 
+  });
+</script>
 </body>
 </html>
