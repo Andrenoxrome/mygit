@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>MyGit — Трекер контента</title>
+  <title>MyTracker — Трекер контента</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -15,18 +15,24 @@
     /* Sidebar */
     #sidebar, .menu-text, #logo-text, .menu-item i, .menu-item span { transition: all 0.2s ease-in-out; }
     #sidebar { border-top-right-radius: 32px; border-bottom-right-radius: 32px; overflow-y: hidden !important; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3); z-index: 1000; transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.3s ease; display: flex; flex-direction: column; }
-    .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px; border-bottom: 1px solid rgba(63, 63, 70, 0.5); }
+    .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px; border-bottom: 1px solid rgba(63, 63, 70, 0.5); transition: all 0.2s; }
     .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; transition: all 0.2s; }
+    /* В свернутом состоянии логотип по центру, текст скрыт */
     .sidebar-collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
     .sidebar-collapsed .logo-area { justify-content: center; width: 100%; }
     .sidebar-collapsed .logo-text { display: none; }
+    .sidebar-collapsed .menu-text { display: none; }
+    .sidebar-collapsed .menu-item { justify-content: center; padding: 12px 0 !important; }
+    .sidebar-collapsed .menu-item i { margin: 0 auto; }
+    .sidebar-collapsed .menu-counter { display: none; }
+    
     .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
     body.sidebar-mobile-open .sidebar-overlay { opacity: 1; visibility: visible; }
-    .menu-item { border-radius: 20px; margin: 4px 0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s; }
+    .menu-item { border-radius: 20px; margin: 4px 0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s; padding: 10px 16px; }
     .menu-item:hover { transform: translateX(2px); background: #2c2c3a; }
     .menu-item.active { background: linear-gradient(135deg, #2c2c3a 0%, #23232e 100%); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .menu-item.active i { color: #c084fc; text-shadow: 0 0 4px rgba(192,132,252,0.3); }
-    .menu-counter { margin-left: auto; background: rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: #c084fc; }
+    .menu-counter { margin-left: auto; background: rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: #c084fc; transition: all 0.2s; }
     .rating-star { cursor: pointer; transition: transform 0.1s; }
     .rating-star:hover { transform: scale(1.15); }
     .rating-star-active { color: #fbbf24; }
@@ -81,11 +87,12 @@
       body.sidebar-mobile-open #sidebar { transform: translateX(0); }
       .sidebar-overlay { display: block; }
       .mobile-menu-toggle { display: flex; }
-      .menu-text { opacity: 1 !important; display: inline-block !important; }
+      .menu-text { display: inline-block !important; }
       .menu-counter { display: inline-block !important; }
-      .logo-text { opacity: 1 !important; display: inline-block !important; }
+      .logo-text { display: inline-block !important; }
       #toggle-btn-top, #toggle-btn-bottom { display: none; }
-      #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; }
+      #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; padding-right: 16px !important; }
+      #sidebar .menu-item i { margin: 0 16px 0 0 !important; }
       .custom-dropdown { width: 100%; }
       .dropdown-items { max-height: 200px; }
     }
@@ -114,17 +121,17 @@
 <!-- Sidebar -->
 <div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px">
   <div class="sidebar-header">
-    <div class="logo-area"><div class="logo-icon"><i class="fa-solid fa-globe"></i></div><span id="logo-text" class="logo-text">MyGit</span></div>
+    <div class="logo-area"><div class="logo-icon"><i class="fa-solid fa-globe"></i></div><span id="logo-text" class="logo-text">MyTracker</span></div>
     <button onclick="toggleSidebarDesktop()" id="toggle-btn-top" class="text-zinc-300 hover:text-white p-2 rounded-xl"><i class="fa-solid fa-chevron-right text-xl"></i></button>
   </div>
   <div class="flex-1 py-6 px-3 space-y-1.5">
-    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Главная</span></a>
-    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Книги</span><span id="counter-books" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Сериалы</span><span id="counter-series" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Кино</span><span id="counter-movies" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('travel'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-plane w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Путешествия</span><span id="counter-travel" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('articles'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-newspaper w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Статьи</span><span id="counter-articles" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">WishList</span><span id="counter-wishlist" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Главная</span></a>
+    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Книги</span><span id="counter-books" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Сериалы</span><span id="counter-series" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Кино</span><span id="counter-movies" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('travel'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-plane w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Путешествия</span><span id="counter-travel" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('articles'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-newspaper w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Статьи</span><span id="counter-articles" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">WishList</span><span id="counter-wishlist" class="menu-counter">0</span></a>
   </div>
   <div class="p-4 border-t border-zinc-700/50">
     <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl"><i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i><span id="bottom-toggle-text" class="menu-text text-sm">Свернуть меню</span></button>
@@ -373,14 +380,14 @@
       content = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
       ext = 'csv'; type = 'text/csv;charset=utf-8;'; content = '\uFEFF' + content; showToast('📊 CSV экспортирован');
     } else {
-      let txt = '=== MYGIT ТРЕКЕР КОНТЕНТА ===\n\n';
+      let txt = '=== MyTracker — Трекер контента ===\n\n';
       allItems.forEach(i => { txt += `[${i.category.toUpperCase()}] ${i.title}${i.author ? ' — ' + i.author : ''}\n   Дата: ${i.date} | Рейтинг: ${i.rating}⭐ | Статус: ${i.status} | Прогресс: ${i.progress}\n   Теги: ${i.tags || 'нет'} | Постер: ${i.poster || 'нет'}\n\n`; });
       content = txt; ext = 'txt'; type = 'text/plain'; showToast('📄 TXT экспортирован');
     }
     const blob = new Blob([content], { type });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `mygit_${new Date().toISOString().slice(0, 19)}.${ext}`;
+    a.download = `mytracker_${new Date().toISOString().slice(0, 19)}.${ext}`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -433,18 +440,14 @@
     const topIcon = document.querySelector('#toggle-btn-top i'), bottomText = document.getElementById('bottom-toggle-text'), bottomIcon = document.getElementById('bottom-toggle-icon');
     if (isCollapsed) {
       sidebar.style.width = '64px'; main.style.marginLeft = '64px'; sidebar.classList.add('sidebar-collapsed');
-      document.querySelectorAll('.menu-item').forEach(i => { i.style.justifyContent = 'center'; i.style.paddingLeft = '0'; i.style.paddingRight = '0'; });
       if (topIcon) topIcon.className = 'fa-solid fa-chevron-right text-xl';
       if (bottomText) bottomText.style.display = 'none';
       if (bottomIcon) bottomIcon.className = 'fa-solid fa-chevron-right text-lg';
-      document.querySelector('.logo-text')?.classList.add('hidden');
     } else {
       sidebar.style.width = '260px'; main.style.marginLeft = '260px'; sidebar.classList.remove('sidebar-collapsed');
-      document.querySelectorAll('.menu-item').forEach(i => { i.style.justifyContent = 'flex-start'; i.style.paddingLeft = '16px'; i.style.paddingRight = '16px'; });
       if (topIcon) topIcon.className = 'fa-solid fa-chevron-left text-xl';
       if (bottomText) bottomText.style.display = 'inline-block';
       if (bottomIcon) bottomIcon.className = 'fa-solid fa-chevron-left text-lg';
-      document.querySelector('.logo-text')?.classList.remove('hidden');
     }
   }
   function toggleMobileSidebar() { document.body.classList.toggle('sidebar-mobile-open'); }
@@ -453,12 +456,13 @@
   // ==================== INITIALIZATION ====================
   window.addEventListener('DOMContentLoaded', () => {
     if (window.innerWidth > 768) {
-      document.getElementById('sidebar').style.width = '64px';
-      document.getElementById('main-content').style.marginLeft = '64px';
-      document.getElementById('sidebar').classList.add('sidebar-collapsed');
-      document.querySelectorAll('.menu-item').forEach(i => { i.style.justifyContent = 'center'; i.style.paddingLeft = '0'; i.style.paddingRight = '0'; });
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('main-content');
+      sidebar.style.width = '64px';
+      main.style.marginLeft = '64px';
+      sidebar.classList.add('sidebar-collapsed');
       document.getElementById('bottom-toggle-text').style.display = 'none';
-      document.querySelector('.logo-text')?.classList.add('hidden');
+      // В свернутом состоянии текст пунктов меню скрыт через CSS
     }
     initDropdown('dropdown-button', 'dropdown-menu', '#dropdown-menu .dropdown-item', (val, item) => { currentCategory = val; const icon = item.querySelector('i').cloneNode(true); document.getElementById('selected-category-text').innerHTML = icon.outerHTML + ' ' + item.textContent.trim(); }, i => i.getAttribute('data-value'));
     initDropdown('status-button', 'status-menu', '#status-menu .dropdown-item', (val) => { currentStatusValue = val; const info = STATUS_MAP[val]; document.getElementById('selected-status-text').innerHTML = `<i class="${info.icon}"></i> ${info.text}`; }, i => i.getAttribute('data-status'));
