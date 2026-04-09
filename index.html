@@ -9,66 +9,24 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #0a0a0f; overflow-x: hidden; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
     
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    
+    /* Sidebar */
     #sidebar, .menu-text, #logo-text, .menu-item i, .menu-item span { transition: all 0.2s ease-in-out; }
-    #sidebar { 
-      border-top-right-radius: 32px; 
-      border-bottom-right-radius: 32px; 
-      overflow-y: hidden !important; 
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3); 
-      z-index: 1000; 
-      transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.3s ease; 
-      display: flex; 
-      flex-direction: column; 
-    }
-    #sidebar .flex-1 { overflow-y: visible; }
-    
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 16px;
-      border-bottom: 1px solid rgba(63, 63, 70, 0.5);
-    }
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      overflow: hidden;
-      transition: all 0.2s;
-    }
-    .sidebar-collapsed .sidebar-header {
-      justify-content: center;
-      padding: 20px 0;
-    }
-    .sidebar-collapsed .logo-area {
-      justify-content: center;
-      width: 100%;
-    }
-    .sidebar-collapsed .logo-text {
-      display: none;
-    }
-    
+    #sidebar { border-top-right-radius: 32px; border-bottom-right-radius: 32px; overflow-y: hidden !important; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3); z-index: 1000; transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.3s ease; display: flex; flex-direction: column; }
+    .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px; border-bottom: 1px solid rgba(63, 63, 70, 0.5); }
+    .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; transition: all 0.2s; }
+    .sidebar-collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    .sidebar-collapsed .logo-area { justify-content: center; width: 100%; }
+    .sidebar-collapsed .logo-text { display: none; }
     .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
     body.sidebar-mobile-open .sidebar-overlay { opacity: 1; visibility: visible; }
-    .menu-item { border-radius: 20px; margin: 4px 0; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: flex-start; cursor: pointer; position: relative; }
-    .sidebar-collapsed .menu-item { justify-content: center; padding: 12px 0 !important; }
-    .sidebar-collapsed .menu-item i { margin: 0 auto; }
-    .sidebar-collapsed .menu-item .menu-text { display: none; }
-    .sidebar-collapsed .menu-item .menu-counter { display: none; }
+    .menu-item { border-radius: 20px; margin: 4px 0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s; }
     .menu-item:hover { transform: translateX(2px); background: #2c2c3a; }
     .menu-item.active { background: linear-gradient(135deg, #2c2c3a 0%, #23232e 100%); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .menu-item.active i { color: #c084fc; text-shadow: 0 0 4px rgba(192,132,252,0.3); }
-    .menu-counter { margin-left: auto; background: rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: #c084fc; transition: all 0.2s; }
-    .menu-item.active .menu-counter { background: rgba(139, 92, 246, 0.4); color: #e9d5ff; }
+    .menu-counter { margin-left: auto; background: rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: #c084fc; }
     .rating-star { cursor: pointer; transition: transform 0.1s; }
     .rating-star:hover { transform: scale(1.15); }
     .rating-star-active { color: #fbbf24; }
@@ -78,143 +36,45 @@
     .tag { background: #3f3f46; padding: 2px 8px; border-radius: 16px; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; }
     .tag:hover { background: #52525b; transform: scale(1.02); }
     .tag-active { background: #8b5cf6; color: white; }
-    .modal { transition: opacity 0.2s ease; }
     
-    /* ===== КАСТОМНЫЙ ВЫПАДАЮЩИЙ СПИСОК ===== */
-    .custom-dropdown {
-      position: relative;
-      min-width: 160px;
-    }
-    .dropdown-button {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      background: #27272a;
-      border: 1px solid #3f3f46;
-      border-radius: 32px;
-      padding: 12px 18px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #f4f4f5;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      white-space: nowrap;
-    }
-    .dropdown-button:hover {
-      border-color: #8b5cf6;
-      background: #32323e;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
-    }
-    .dropdown-button .dropdown-icon {
-      transition: transform 0.2s;
-      font-size: 0.75rem;
-      color: #a1a1aa;
-    }
-    .dropdown-button:hover .dropdown-icon {
-      color: #c084fc;
-    }
-    .dropdown-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 0;
-      right: 0;
-      background: #27272a;
-      border: 1px solid #3f3f46;
-      border-radius: 24px;
-      overflow: hidden;
-      z-index: 100;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.2s ease;
-      box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.3);
-    }
-    .dropdown-menu.open {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-    .dropdown-items {
-      max-height: 280px;
-      overflow-y: auto;
-      padding: 8px 0;
-    }
-    .dropdown-items::-webkit-scrollbar {
-      width: 6px;
-    }
-    .dropdown-items::-webkit-scrollbar-track {
-      background: #18181b;
-      border-radius: 10px;
-      margin: 8px 0;
-    }
-    .dropdown-items::-webkit-scrollbar-thumb {
-      background: #8b5cf6;
-      border-radius: 10px;
-    }
-    .dropdown-items::-webkit-scrollbar-thumb:hover {
-      background: #a78bfa;
-    }
-    .dropdown-items {
-      scrollbar-width: thin;
-      scrollbar-color: #8b5cf6 #18181b;
-    }
-    .dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 18px;
-      font-size: 0.9rem;
-      color: #f4f4f5;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .dropdown-item:hover {
-      background: #3f3f46;
-    }
-    .dropdown-item.selected {
-      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      color: white;
-    }
-    .dropdown-item i {
-      width: 20px;
-      font-size: 1rem;
-    }
+    /* Custom Dropdown */
+    .custom-dropdown { position: relative; min-width: 160px; }
+    .dropdown-button { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #27272a; border: 1px solid #3f3f46; border-radius: 32px; padding: 12px 18px; font-size: 0.95rem; font-weight: 500; color: #f4f4f5; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .dropdown-button:hover { border-color: #8b5cf6; background: #32323e; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
+    .dropdown-button .dropdown-icon { transition: transform 0.2s; font-size: 0.75rem; color: #a1a1aa; }
+    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #27272a; border: 1px solid #3f3f46; border-radius: 24px; overflow: hidden; z-index: 100; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s ease; box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.3); }
+    .dropdown-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-items { max-height: 280px; overflow-y: auto; padding: 8px 0; scrollbar-width: thin; scrollbar-color: #8b5cf6 #18181b; }
+    .dropdown-items::-webkit-scrollbar { width: 6px; }
+    .dropdown-items::-webkit-scrollbar-track { background: #18181b; border-radius: 10px; margin: 8px 0; }
+    .dropdown-items::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
+    .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 18px; font-size: 0.9rem; color: #f4f4f5; cursor: pointer; transition: background 0.15s; }
+    .dropdown-item:hover { background: #3f3f46; }
+    .dropdown-item.selected { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
     
-    html.light .dropdown-button {
-      background: #ffffff;
-      border-color: #d4d4d8;
-      color: #18181b;
-    }
-    html.light .dropdown-button:hover {
-      background: #fafafa;
-      border-color: #8b5cf6;
-    }
-    html.light .dropdown-menu {
-      background: #ffffff;
-      border-color: #e4e4e7;
-    }
-    html.light .dropdown-items {
-      scrollbar-color: #c084fc #f4f4f5;
-    }
-    html.light .dropdown-items::-webkit-scrollbar-track {
-      background: #f4f4f5;
-    }
-    html.light .dropdown-items::-webkit-scrollbar-thumb {
-      background: #c084fc;
-    }
-    html.light .dropdown-item {
-      color: #18181b;
-    }
-    html.light .dropdown-item:hover {
-      background: #f4f4f5;
-    }
-    html.light .dropdown-item.selected {
-      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      color: white;
-    }
+    /* Light theme */
+    html.light .dropdown-button { background: #ffffff; border-color: #d4d4d8; color: #18181b; }
+    html.light .dropdown-button:hover { background: #fafafa; border-color: #8b5cf6; }
+    html.light .dropdown-menu { background: #ffffff; border-color: #e4e4e7; }
+    html.light .dropdown-items { scrollbar-color: #c084fc #f4f4f5; }
+    html.light .dropdown-items::-webkit-scrollbar-track { background: #f4f4f5; }
+    html.light .dropdown-items::-webkit-scrollbar-thumb { background: #c084fc; }
+    html.light .dropdown-item { color: #18181b; }
+    html.light .dropdown-item:hover { background: #f4f4f5; }
+    html.light .dropdown-item.selected { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
+    html.light .status-badge { background: #e4e4e9; color: #18181b; }
+    html.light .tag { background: #d4d4d8; color: #18181b; }
+    html.light .tag-active { background: #7c3aed; color: white; }
+    html.light .menu-counter { background: rgba(124, 58, 237, 0.15); color: #7c3aed; }
+    html.light body { background-color: #f4f4f9; }
+    html.light .bg-zinc-950 { background-color: #ffffff !important; }
+    html.light .bg-zinc-900 { background-color: #f0f0f5 !important; }
+    html.light .border-zinc-700 { border-color: #d4d4d8 !important; }
+    html.light #sidebar { background-color: #fefefe; }
+    html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
+    html.light .menu-item.active i { color: #7c3aed; }
     
+    /* Responsive */
     @media (max-width: 768px) {
       #main-content { margin-left: 0 !important; }
       #sidebar { transform: translateX(-100%); width: 260px !important; position: fixed; border-radius: 0 32px 32px 0; }
@@ -226,14 +86,11 @@
       .logo-text { opacity: 1 !important; display: inline-block !important; }
       #toggle-btn-top, #toggle-btn-bottom { display: none; }
       #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; }
-      .search-filter-container { flex-direction: column; align-items: stretch !important; }
-      .logo-icon { width: 36px; height: 36px; }
-      .logo-icon i { font-size: 1.2rem; }
-      .logo-text { font-size: 1.2rem; }
       .custom-dropdown { width: 100%; }
       .dropdown-items { max-height: 200px; }
     }
     @media (min-width: 769px) { .sidebar-overlay, .mobile-menu-toggle { display: none; } }
+    
     .mobile-menu-toggle { background: transparent; border: none; cursor: pointer; }
     #sidebar::-webkit-scrollbar { display: none; }
     #sidebar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -241,27 +98,10 @@
     .content-card:hover { border-color: #8b5cf6; transform: translateY(-2px); }
     .toast-notification { animation: slideIn 0.3s ease-out; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    html.dark body { background-color: #09090b; }
-    html.light body { background-color: #f4f4f9; }
-    html.light .bg-zinc-950 { background-color: #ffffff !important; }
-    html.light .bg-zinc-900 { background-color: #f0f0f5 !important; }
-    html.light .border-zinc-700 { border-color: #d4d4d8 !important; }
-    html.light #sidebar { background-color: #fefefe; }
-    html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
-    html.light .menu-item.active i { color: #7c3aed; }
-    html.light .bg-violet-600 { background-color: #7c3aed; }
-    html.light .status-badge { background: #e4e4e9; color: #18181b; }
-    html.light .tag { background: #d4d4d8; color: #18181b; }
-    html.light .tag-active { background: #7c3aed; color: white; }
-    html.light .menu-counter { background: rgba(124, 58, 237, 0.15); color: #7c3aed; }
-    
     .search-input { transition: all 0.2s; }
     .filter-tags-container { max-height: 80px; overflow-y: auto; scrollbar-width: thin; }
-
-    .logo-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
-    .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3), 0 0 0 2px rgba(255,255,255,0.1); transition: all 0.3s ease; position: relative; overflow: hidden; }
-    .logo-icon::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%); border-radius: 20px; }
-    .logo-icon i { font-size: 1.4rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1; }
+    .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3), 0 0 0 2px rgba(255,255,255,0.1); transition: all 0.3s ease; }
+    .logo-icon i { font-size: 1.4rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .logo-icon:hover { transform: scale(1.02) rotate(2deg); box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4); }
     .logo-text { font-size: 1.35rem; font-weight: 700; background: linear-gradient(135deg, #f4f4f5 0%, #c084fc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.3px; }
     html.light .logo-text { background: linear-gradient(135deg, #18181b 0%, #7c3aed 100%); -webkit-background-clip: text; background-clip: text; }
@@ -271,32 +111,27 @@
 
 <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
-<div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px; overflow-y: hidden;">
+<!-- Sidebar -->
+<div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px">
   <div class="sidebar-header">
-    <div class="logo-area">
-      <div class="logo-wrapper">
-        <div class="logo-icon">
-          <i class="fa-solid fa-globe"></i>
-        </div>
-      </div>
-      <span id="logo-text" class="logo-text logo-text-show">MyGit</span>
-    </div>
-    <button onclick="toggleSidebarDesktop()" id="toggle-btn-top" class="text-zinc-300 hover:text-white p-2 rounded-xl transition-all hover:bg-zinc-800/50"><i class="fa-solid fa-chevron-right text-xl"></i></button>
+    <div class="logo-area"><div class="logo-icon"><i class="fa-solid fa-globe"></i></div><span id="logo-text" class="logo-text">MyGit</span></div>
+    <button onclick="toggleSidebarDesktop()" id="toggle-btn-top" class="text-zinc-300 hover:text-white p-2 rounded-xl"><i class="fa-solid fa-chevron-right text-xl"></i></button>
   </div>
   <div class="flex-1 py-6 px-3 space-y-1.5">
-    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Главная</span></a>
-    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Книги</span><span id="counter-books" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Сериалы</span><span id="counter-series" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Кино</span><span id="counter-movies" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('travel'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-plane w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Путешествия</span><span id="counter-travel" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('articles'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-newspaper w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Статьи</span><span id="counter-articles" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">WishList</span><span id="counter-wishlist" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Главная</span></a>
+    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Книги</span><span id="counter-books" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Сериалы</span><span id="counter-series" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Кино</span><span id="counter-movies" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('travel'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-plane w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Путешествия</span><span id="counter-travel" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('articles'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-newspaper w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Статьи</span><span id="counter-articles" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">WishList</span><span id="counter-wishlist" class="menu-counter">0</span></a>
   </div>
   <div class="p-4 border-t border-zinc-700/50">
-    <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl transition-all hover:bg-zinc-800/50"><i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i><span id="bottom-toggle-text" class="menu-text text-sm">Свернуть меню</span></button>
+    <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl"><i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i><span id="bottom-toggle-text" class="menu-text text-sm">Свернуть меню</span></button>
   </div>
 </div>
 
+<!-- Main Content -->
 <div class="flex-1 flex flex-col h-screen ml-0 md:ml-16 transition-all duration-300" id="main-content">
   <div class="h-14 border-b border-zinc-700 flex items-center px-4 md:px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-2">
     <button onclick="toggleMobileSidebar()" class="mobile-menu-toggle text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden"><i class="fa-solid fa-bars text-2xl"></i></button>
@@ -310,33 +145,25 @@
   </div>
 
   <div class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto no-scrollbar">
+    <!-- Home Screen -->
     <div id="home-screen" class="w-full max-w-2xl mt-4 md:mt-12">
       <div class="text-center mb-6 md:mb-12">
-        <div class="inline-flex items-center justify-center mb-4">
-          <div class="logo-icon w-16 h-16 md:w-20 md:h-20 rounded-3xl shadow-2xl">
-            <i class="fa-solid fa-globe text-2xl md:text-3xl"></i>
-          </div>
-        </div>
+        <div class="inline-flex items-center justify-center mb-4"><div class="logo-icon w-16 h-16 md:w-20 md:h-20 rounded-3xl shadow-2xl"><i class="fa-solid fa-globe text-2xl md:text-3xl"></i></div></div>
         <p class="text-3xl md:text-5xl font-light bg-gradient-to-r from-zinc-200 via-violet-300 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p>
         <p class="text-zinc-500 text-xs md:text-sm mt-3">Книги, сериалы, кино, путешествия, статьи — с рейтингом, тегами и прогрессом</p>
       </div>
       <div class="w-full">
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 gap-2 shadow-xl">
           <div class="custom-dropdown" id="category-dropdown">
-            <div class="dropdown-button" id="dropdown-button">
-              <span id="selected-category-text">📚 Книги</span>
-              <i class="fa-solid fa-chevron-down dropdown-icon"></i>
-            </div>
-            <div class="dropdown-menu" id="dropdown-menu">
-              <div class="dropdown-items">
-                <div class="dropdown-item selected" data-value="books"><i class="fa-solid fa-book"></i> Книги</div>
-                <div class="dropdown-item" data-value="series"><i class="fa-solid fa-tv"></i> Сериалы</div>
-                <div class="dropdown-item" data-value="movies"><i class="fa-solid fa-film"></i> Кино</div>
-                <div class="dropdown-item" data-value="travel"><i class="fa-solid fa-plane"></i> Путешествия</div>
-                <div class="dropdown-item" data-value="articles"><i class="fa-solid fa-newspaper"></i> Статьи</div>
-                <div class="dropdown-item" data-value="wishlist"><i class="fa-solid fa-heart"></i> WishList</div>
-              </div>
-            </div>
+            <div class="dropdown-button" id="dropdown-button"><span id="selected-category-text">📚 Книги</span><i class="fa-solid fa-chevron-down dropdown-icon"></i></div>
+            <div class="dropdown-menu" id="dropdown-menu"><div class="dropdown-items">
+              <div class="dropdown-item selected" data-value="books"><i class="fa-solid fa-book"></i> Книги</div>
+              <div class="dropdown-item" data-value="series"><i class="fa-solid fa-tv"></i> Сериалы</div>
+              <div class="dropdown-item" data-value="movies"><i class="fa-solid fa-film"></i> Кино</div>
+              <div class="dropdown-item" data-value="travel"><i class="fa-solid fa-plane"></i> Путешествия</div>
+              <div class="dropdown-item" data-value="articles"><i class="fa-solid fa-newspaper"></i> Статьи</div>
+              <div class="dropdown-item" data-value="wishlist"><i class="fa-solid fa-heart"></i> WishList</div>
+            </div></div>
           </div>
           <div class="flex-1 relative"><textarea id="input" rows="1" class="w-full bg-transparent border-0 focus:outline-none text-base py-3 px-3 resize-none placeholder-zinc-500" placeholder="Название..."></textarea></div>
           <button onclick="sendMessage()" class="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 w-11 h-11 flex items-center justify-center rounded-2xl transition-all active:scale-95 shadow-lg"><i class="fa-solid fa-paper-plane text-white"></i></button>
@@ -344,242 +171,305 @@
         <p class="text-xs text-zinc-500 mt-3 text-center">Нажмите Enter, чтобы добавить</p>
       </div>
     </div>
+    
+    <!-- Section Screen -->
     <div id="section-screen" class="w-full max-w-4xl hidden mt-4">
       <div class="search-filter-container mb-6 space-y-3">
-        <div class="relative">
-          <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i>
-          <input type="text" id="search-input" placeholder="Поиск по названию..." class="search-input w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-10 pr-4 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500 transition">
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-zinc-500"><i class="fa-regular fa-tags"></i> Фильтр по тегам:</span>
-          <div id="filter-tags-list" class="filter-tags-container flex flex-wrap gap-2 flex-1"></div>
-          <button onclick="clearFilters()" class="text-xs text-zinc-500 hover:text-red-400 transition px-2 py-1 rounded-lg hover:bg-zinc-800"><i class="fa-regular fa-times-circle"></i> Сбросить</button>
-        </div>
+        <div class="relative"><i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i><input type="text" id="search-input" placeholder="Поиск по названию..." class="search-input w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-10 pr-4 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500 transition"></div>
+        <div class="flex flex-wrap items-center gap-2"><span class="text-xs text-zinc-500"><i class="fa-regular fa-tags"></i> Фильтр по тегам:</span><div id="filter-tags-list" class="filter-tags-container flex flex-wrap gap-2 flex-1"></div><button onclick="clearFilters()" class="text-xs text-zinc-500 hover:text-red-400 transition px-2 py-1 rounded-lg hover:bg-zinc-800"><i class="fa-regular fa-times-circle"></i> Сбросить</button></div>
       </div>
       <div id="content-list" class="space-y-4 pb-10"></div>
     </div>
   </div>
 </div>
+
 <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 z-[100] flex flex-col gap-2 w-full max-w-[90%] md:max-w-md"></div>
 
-<!-- Модальное окно редактирования -->
+<!-- Edit Modal -->
 <div id="edit-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[200] hidden transition-all" style="backdrop-filter: blur(4px);">
   <div class="bg-zinc-900 rounded-3xl w-full max-w-lg mx-4 p-6 border border-zinc-700 shadow-2xl">
     <h3 class="text-xl font-semibold mb-4 flex items-center gap-2"><i class="fa-solid fa-pen text-violet-400"></i> Редактировать</h3>
     <input type="text" id="edit-title" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Название">
-    
-    <!-- Поле Автор (только для книг) -->
     <input type="text" id="edit-author" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Автор">
-    
     <input type="text" id="edit-tags" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Теги (через запятую)">
     <input type="text" id="edit-poster" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="URL обложки/постера">
-    
     <div class="custom-dropdown w-full mb-3" id="status-dropdown">
-      <div class="dropdown-button" id="status-button">
-        <span id="selected-status-text">📅 В планах</span>
-        <i class="fa-solid fa-chevron-down dropdown-icon"></i>
-      </div>
-      <div class="dropdown-menu" id="status-menu">
-        <div class="dropdown-items">
-          <div class="dropdown-item selected" data-status="planned"><i class="fa-regular fa-calendar"></i> 📅 В планах</div>
-          <div class="dropdown-item" data-status="progress"><i class="fa-regular fa-clock"></i> ⏳ В процессе</div>
-          <div class="dropdown-item" data-status="completed"><i class="fa-regular fa-circle-check"></i> ✅ Завершено</div>
-          <div class="dropdown-item" data-status="abandoned"><i class="fa-regular fa-circle-xmark"></i> ❌ Брошено</div>
-        </div>
-      </div>
+      <div class="dropdown-button" id="status-button"><span id="selected-status-text">📅 В планах</span><i class="fa-solid fa-chevron-down dropdown-icon"></i></div>
+      <div class="dropdown-menu" id="status-menu"><div class="dropdown-items">
+        <div class="dropdown-item selected" data-status="planned"><i class="fa-regular fa-calendar"></i> 📅 В планах</div>
+        <div class="dropdown-item" data-status="progress"><i class="fa-regular fa-clock"></i> ⏳ В процессе</div>
+        <div class="dropdown-item" data-status="completed"><i class="fa-regular fa-circle-check"></i> ✅ Завершено</div>
+        <div class="dropdown-item" data-status="abandoned"><i class="fa-regular fa-circle-xmark"></i> ❌ Брошено</div>
+      </div></div>
     </div>
-    
-    <!-- Поле Прогресс (скрыто для книг) -->
-    <div id="progress-field-container" class="flex gap-3 mb-4">
-      <input type="number" id="edit-progress" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Прогресс (сезон/серия/страница)" step="1">
-      <span class="text-zinc-400 text-sm self-center">(число)</span>
-    </div>
+    <div id="progress-field-container" class="flex gap-3 mb-4"><input type="number" id="edit-progress" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Прогресс" step="1"><span class="text-zinc-400 text-sm self-center">(число)</span></div>
     <div class="flex gap-3"><button onclick="saveEdit()" class="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 py-3 rounded-xl font-medium transition">Сохранить</button><button onclick="closeModal()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 py-3 rounded-xl transition">Отмена</button></div>
   </div>
 </div>
 
 <script>
-  let currentEditItem = { section: null, id: null };
-  let isDark = true, currentSection = 'home', isCollapsed = true;
-  let currentSearchQuery = '';
-  let currentSelectedTag = null;
-  let currentCategory = 'books';
-  let currentStatusValue = 'planned';
+  // ==================== CONSTANTS & STATE ====================
+  const SECTIONS = ['books', 'series', 'movies', 'travel', 'articles', 'wishlist'];
+  const SECTION_NAMES = { books: '📖 Книги', series: '📺 Сериалы', movies: '🎬 Кино', travel: '✈️ Путешествия', articles: '📰 Статьи', wishlist: '💖 WishList' };
+  const STATUS_MAP = { planned: { text: '📅 В планах', icon: 'fa-regular fa-calendar' }, progress: { text: '⏳ В процессе', icon: 'fa-regular fa-clock' }, completed: { text: '✅ Завершено', icon: 'fa-regular fa-circle-check' }, abandoned: { text: '❌ Брошено', icon: 'fa-regular fa-circle-xmark' } };
   
-  let data = { books: [], series: [], movies: [], travel: [], articles: [], wishlist: [] };
-  ['books', 'series', 'movies', 'travel', 'articles', 'wishlist'].forEach(s => { data[s] = JSON.parse(localStorage.getItem(s)) || []; });
+  let data = {};
+  SECTIONS.forEach(s => { data[s] = JSON.parse(localStorage.getItem(s)) || []; });
+  
+  let currentSection = 'home', currentCategory = 'books', currentSearchQuery = '', currentSelectedTag = null, currentStatusValue = 'planned', currentEditItem = null, isDark = true, isCollapsed = true;
 
-  function initCategoryDropdown() {
-    const button = document.getElementById('dropdown-button');
-    const menu = document.getElementById('dropdown-menu');
-    const items = document.querySelectorAll('#dropdown-menu .dropdown-item');
+  // ==================== UTILITIES ====================
+  const showToast = (msg, type = 'success') => {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    const bg = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-blue-600' }[type];
+    toast.className = `${bg} text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 toast-notification`;
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${msg}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
+  };
+  
+  const escapeHtml = str => String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+  const saveToLocal = () => SECTIONS.forEach(s => localStorage.setItem(s, JSON.stringify(data[s])));
+  const updateMenuCounters = () => SECTIONS.forEach(s => { const el = document.getElementById(`counter-${s}`); if (el) el.innerText = data[s].length; });
+  
+  // ==================== CUSTOM DROPDOWN ====================
+  function initDropdown(buttonId, menuId, itemsSelector, onSelect, getValue) {
+    const button = document.getElementById(buttonId);
+    const menu = document.getElementById(menuId);
+    const items = document.querySelectorAll(itemsSelector);
+    if (!button || !menu) return;
     button.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('open'); });
     items.forEach(item => {
       item.addEventListener('click', () => {
-        const value = item.getAttribute('data-value');
-        const text = item.textContent.trim();
-        currentCategory = value;
+        const value = getValue(item);
+        onSelect(value, item);
         items.forEach(i => i.classList.remove('selected'));
         item.classList.add('selected');
-        const icon = item.querySelector('i').cloneNode(true);
-        document.getElementById('selected-category-text').innerHTML = icon.outerHTML + ' ' + text;
         menu.classList.remove('open');
       });
     });
     document.addEventListener('click', (e) => { if (!button.contains(e.target) && !menu.contains(e.target)) menu.classList.remove('open'); });
   }
   
-  function initStatusDropdown() {
-    const button = document.getElementById('status-button');
-    const menu = document.getElementById('status-menu');
-    const items = document.querySelectorAll('#status-menu .dropdown-item');
-    button.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('open'); });
-    items.forEach(item => {
-      item.addEventListener('click', () => {
-        const value = item.getAttribute('data-status');
-        const text = item.textContent.trim();
-        currentStatusValue = value;
-        items.forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-        const icon = item.querySelector('i').cloneNode(true);
-        document.getElementById('selected-status-text').innerHTML = icon.outerHTML + ' ' + text;
-        menu.classList.remove('open');
-      });
+  // ==================== RENDER FUNCTIONS ====================
+  function renderContent(section) {
+    const container = document.getElementById('content-list');
+    if (!container) return;
+    let items = data[section];
+    let filtered = [...items];
+    if (currentSearchQuery) filtered = filtered.filter(i => i.text.toLowerCase().includes(currentSearchQuery.toLowerCase()));
+    if (currentSelectedTag) filtered = filtered.filter(i => i.tags && i.tags.includes(currentSelectedTag));
+    
+    const uniqueTags = new Set();
+    items.forEach(i => { if (i.tags) i.tags.forEach(t => uniqueTags.add(t)); });
+    const tagsContainer = document.getElementById('filter-tags-list');
+    if (tagsContainer) {
+      tagsContainer.innerHTML = uniqueTags.size ? [...uniqueTags].sort().map(t => `<span class="tag ${currentSelectedTag === t ? 'tag-active' : ''}" onclick="filterByTag('${escapeHtml(t)}')"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('') : '<span class="text-xs text-zinc-500">Нет тегов</span>';
+    }
+    
+    container.innerHTML = filtered.length ? '' : `<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>${currentSearchQuery || currentSelectedTag ? 'Нет записей по выбранным фильтрам' : 'Пока ничего нет. Добавьте первый элемент!'}</p>${currentSearchQuery || currentSelectedTag ? '<button onclick="clearFilters()" class="text-sm text-violet-400 hover:text-violet-300 mt-2">Сбросить фильтры</button>' : ''}</div>`;
+    
+    filtered.forEach(item => {
+      const rating = item.rating || 0;
+      const statusText = STATUS_MAP[item.status]?.text || '📅 В планах';
+      const progressText = item.progress ? ` (${item.progress})` : '';
+      const tagsHtml = (item.tags || []).map(t => `<span class="tag"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('');
+      const authorHtml = (section === 'books' && item.author) ? `<div class="text-xs text-zinc-400 mt-1"><i class="fa-regular fa-user"></i> ${escapeHtml(item.author)}</div>` : '';
+      const posterHtml = item.posterUrl ? `<img src="${escapeHtml(item.posterUrl)}" class="w-12 h-16 object-cover rounded-lg shadow-md" onerror="this.style.display='none'" loading="lazy">` : `<div class="w-12 h-16 bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-regular fa-image text-zinc-500 text-xl"></i></div>`;
+      const stars = [1,2,3,4,5].map(i => `<i class="fa-${i <= rating ? 'solid' : 'regular'} fa-star rating-star ${i <= rating ? 'rating-star-active' : 'rating-star-inactive'}" style="cursor:pointer;font-size:0.9rem" onclick="updateRating('${section}',${item.id},${i})"></i>`).join('');
+      container.innerHTML += `<div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 content-card transition-all shadow-md"><div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p>${authorHtml}<div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${stars}</div><span class="status-badge">${statusText}${section !== 'books' ? progressText : ''}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div></div>`;
     });
-    document.addEventListener('click', (e) => { if (!button.contains(e.target) && !menu.contains(e.target)) menu.classList.remove('open'); });
+    
+    document.getElementById('home-screen')?.classList.add('hidden');
+    document.getElementById('section-screen')?.classList.remove('hidden');
+    const titleElem = document.getElementById('content-title');
+    if (titleElem) titleElem.innerHTML = SECTION_NAMES[section] + ` <span class="text-sm text-zinc-500">(${filtered.length}/${items.length})</span>${currentSearchQuery ? ` 🔍 "${currentSearchQuery}"` : ''}${currentSelectedTag ? ` 🏷️ #${currentSelectedTag}` : ''}`;
   }
-
-  function updateMenuCounters(){
-    document.getElementById('counter-books').innerText = data.books.length;
-    document.getElementById('counter-series').innerText = data.series.length;
-    document.getElementById('counter-movies').innerText = data.movies.length;
-    document.getElementById('counter-travel').innerText = data.travel.length;
-    document.getElementById('counter-articles').innerText = data.articles.length;
-    document.getElementById('counter-wishlist').innerText = data.wishlist.length;
-  }
-
-  function showToast(msg, type='success'){ const c=document.getElementById('toast-container'), t=document.createElement('div'), bg={success:'bg-green-600',error:'bg-red-600',info:'bg-blue-600'}[type]; t.className=`${bg} text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 toast-notification`; t.innerHTML=`<i class="fa-solid ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle'}"></i><span>${msg}</span>`; c.appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(20px)';setTimeout(()=>t.remove(),300);},2500); }
-
-  function openEdit(section, id){ 
-    let item=data[section].find(i=>i.id==id); 
-    if(item){ 
-      currentEditItem={section,id}; 
-      document.getElementById('edit-title').value=item.text||''; 
-      document.getElementById('edit-author').value=item.author||'';
-      document.getElementById('edit-tags').value=(item.tags||[]).join(', '); 
-      document.getElementById('edit-poster').value=item.posterUrl||''; 
-      currentStatusValue = item.status || 'planned';
-      const statusMap = { planned: { text: '📅 В планах', icon: 'fa-regular fa-calendar' }, progress: { text: '⏳ В процессе', icon: 'fa-regular fa-clock' }, completed: { text: '✅ Завершено', icon: 'fa-regular fa-circle-check' }, abandoned: { text: '❌ Брошено', icon: 'fa-regular fa-circle-xmark' } };
-      const statusInfo = statusMap[currentStatusValue];
-      document.getElementById('selected-status-text').innerHTML = `<i class="${statusInfo.icon}"></i> ${statusInfo.text}`;
-      const statusItems = document.querySelectorAll('#status-menu .dropdown-item');
-      statusItems.forEach(i => { i.classList.remove('selected'); if(i.getAttribute('data-status') === currentStatusValue) i.classList.add('selected'); });
-      document.getElementById('edit-progress').value=item.progress||0;
-      
-      // Управление видимостью полей в зависимости от категории
-      const progressContainer = document.getElementById('progress-field-container');
-      const authorField = document.getElementById('edit-author');
-      if(section === 'books'){
-        progressContainer.style.display = 'none';
-        authorField.style.display = 'flex';
-        authorField.placeholder = 'Автор книги';
-      } else {
-        progressContainer.style.display = 'flex';
-        authorField.style.display = 'none';
-      }
-      
-      document.getElementById('edit-modal').classList.remove('hidden');
-      if(window.innerWidth <= 768) closeMobileSidebar();
-    } 
-  }
-  function closeModal(){ document.getElementById('edit-modal').classList.add('hidden'); }
-  function saveEdit(){ 
-    let {section,id}=currentEditItem; 
-    let item=data[section].find(i=>i.id==id); 
-    if(item){ 
-      item.text=document.getElementById('edit-title').value; 
-      if(section === 'books') {
-        item.author=document.getElementById('edit-author').value;
-      }
-      let tagsStr=document.getElementById('edit-tags').value; 
-      item.tags=tagsStr?tagsStr.split(',').map(t=>t.trim()).filter(t=>t):[]; 
-      item.posterUrl=document.getElementById('edit-poster').value; 
-      item.status = currentStatusValue;
-      if(section !== 'books') {
-        item.progress=parseInt(document.getElementById('edit-progress').value)||0; 
-      }
-      localStorage.setItem(section,JSON.stringify(data[section])); 
-      if(currentSection === section) renderContent(section); 
-      updateMenuCounters();
-      showToast('✏️ Запись обновлена','success'); 
-      closeModal(); 
-    } 
-  }
-
-  function exportData(format){ let allItems=[]; ['books','series','movies','travel','articles','wishlist'].forEach(cat=>{ data[cat].forEach(item=>{ allItems.push({category:cat,title:item.text,author:item.author||'',date:item.date,rating:item.rating||0,tags:(item.tags||[]).join(', '),status:item.status||'planned',progress:item.progress||0,poster:item.posterUrl||''}); }); });
-    if(format==='json'){ let blob=new Blob([JSON.stringify({version:"2.2",exportDate:new Date(),data:data},null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.json`; a.click(); URL.revokeObjectURL(a.href); showToast('✅ JSON экспортирован'); }
-    else if(format==='csv'){ let headers=['Категория','Название','Автор','Дата','Рейтинг','Теги','Статус','Прогресс','Постер']; let rows=[headers]; allItems.forEach(i=>rows.push([i.category,i.title,i.author,i.date,i.rating,i.tags,i.status,i.progress,i.poster])); let csv=rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n'); let blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href); showToast('📊 CSV экспортирован'); }
-    else if(format==='txt'){ let txt='=== MYGIT ТРЕКЕР КОНТЕНТА ===\n\n'; allItems.forEach(i=>{ txt+=`[${i.category.toUpperCase()}] ${i.title}${i.author ? ' — '+i.author : ''}\n   Дата: ${i.date} | Рейтинг: ${i.rating}⭐ | Статус: ${i.status} | Прогресс: ${i.progress}\n   Теги: ${i.tags||'нет'} | Постер: ${i.poster||'нет'}\n\n`; }); let blob=new Blob([txt],{type:'text/plain'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.txt`; a.click(); URL.revokeObjectURL(a.href); showToast('📄 TXT экспортирован'); }
-  }
-
-  function importData(input){ let file=input.files[0]; if(!file) return; let reader=new FileReader(); reader.onload=e=>{ try{ let imported=JSON.parse(e.target.result); let newData=imported.data||imported; if(newData.books&&newData.series&&newData.movies&&newData.wishlist) data=newData; else throw new Error(); ['books','series','movies','travel','articles','wishlist'].forEach(s=>{ localStorage.setItem(s,JSON.stringify(data[s]||[])); if(!data[s]) data[s]=[]; }); if(currentSection!=='home') renderContent(currentSection); updateMenuCounters(); showToast('📦 Импорт успешен'); input.value=''; }catch(err){ showToast('Ошибка импорта','error'); input.value=''; } }; reader.readAsText(file); }
-
-  function sendMessage(){ let input=document.getElementById('input'); if(!input.value.trim()) return; let text=input.value.trim(); let section = currentCategory; let newItem={id:Date.now(),text:text,date:new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}),rating:0,tags:[],posterUrl:'',status:'planned',progress:0,author:''}; data[section].unshift(newItem); localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection === section) renderContent(section); updateMenuCounters(); input.value=''; input.style.height='auto'; let sectionNames = {books:'Книги',series:'Сериалы',movies:'Кино',travel:'Путешествия',articles:'Статьи',wishlist:'WishList'}; showToast(`➕ Добавлено в ${sectionNames[section]}`); }
-
-  function updateRating(section,id,newRating){ let item=data[section].find(i=>i.id===id); if(item){ item.rating=newRating; localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); showToast(`⭐ Рейтинг: ${newRating}`); } }
-
-  function getUniqueTagsFromItems(items){ let tagsSet = new Set(); items.forEach(item => { if(item.tags && Array.isArray(item.tags)){ item.tags.forEach(tag => tagsSet.add(tag)); } }); return Array.from(tagsSet).sort(); }
-  function updateFilterTagsList(items){ const container = document.getElementById('filter-tags-list'); if(!container) return; const uniqueTags = getUniqueTagsFromItems(items); if(uniqueTags.length === 0){ container.innerHTML = '<span class="text-xs text-zinc-500">Нет тегов</span>'; return; } container.innerHTML = uniqueTags.map(tag => `<span class="tag ${currentSelectedTag === tag ? 'tag-active' : ''}" onclick="filterByTag('${escapeHtml(tag).replace(/'/g, "\\'")}')"><i class="fa-regular fa-hashtag"></i>${escapeHtml(tag)}</span>`).join(''); }
-  function filterByTag(tag){ if(currentSelectedTag === tag){ currentSelectedTag = null; } else { currentSelectedTag = tag; } renderContent(currentSection); }
-  function clearFilters(){ currentSearchQuery = ''; currentSelectedTag = null; document.getElementById('search-input').value = ''; renderContent(currentSection); showToast('Фильтры сброшены', 'info'); }
-  function filterItems(items){ let filtered = [...items]; if(currentSearchQuery){ const query = currentSearchQuery.toLowerCase(); filtered = filtered.filter(item => item.text.toLowerCase().includes(query)); } if(currentSelectedTag){ filtered = filtered.filter(item => item.tags && item.tags.includes(currentSelectedTag)); } return filtered; }
-
-  function renderContent(section){ 
-    let container=document.getElementById('content-list'); if(!container) return; 
-    let items=data[section]; let filteredItems = filterItems(items); updateFilterTagsList(items);
-    container.innerHTML=''; 
-    if(!filteredItems.length){ let message = (currentSearchQuery || currentSelectedTag) ? 'Нет записей по выбранным фильтрам' : 'Пока ничего нет. Добавьте первый элемент!';
-      container.innerHTML=`<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>${message}</p>${(currentSearchQuery || currentSelectedTag) ? '<button onclick="clearFilters()" class="text-sm text-violet-400 hover:text-violet-300 mt-2">Сбросить фильтры</button>' : ''}</div>`; return; }
-    filteredItems.forEach(item=>{ let rating=item.rating||0; let statusMap={planned:'📅 В планах',progress:'⏳ В процессе',completed:'✅ Завершено',abandoned:'❌ Брошено'}; let statusText=statusMap[item.status]||'📅 В планах'; let progressText=item.progress?` (${item.progress})`:''; let tagsHtml=(item.tags||[]).map(t=>`<span class="tag"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('');
-      let authorHtml = (section === 'books' && item.author) ? `<div class="text-xs text-zinc-400 mt-1"><i class="fa-regular fa-user"></i> ${escapeHtml(item.author)}</div>` : '';
-      let posterHtml=item.posterUrl?`<img src="${escapeHtml(item.posterUrl)}" class="w-12 h-16 object-cover rounded-lg shadow-md" onerror="this.style.display='none'" loading="lazy">`:`<div class="w-12 h-16 bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-regular fa-image text-zinc-500 text-xl"></i></div>`;
-      let card=document.createElement('div'); card.className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 content-card transition-all shadow-md";
-      card.innerHTML=`<div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p>${authorHtml}<div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1 transition-colors"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1 transition-colors"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${[1,2,3,4,5].map(i=>`<i class="fa-${i<=rating?'solid':'regular'} fa-star rating-star ${i<=rating?'rating-star-active':'rating-star-inactive'}" style="cursor:pointer;font-size:0.9rem" onclick="updateRating('${section}',${item.id},${i})"></i>`).join('')}</div><span class="status-badge">${statusText}${section !== 'books' ? progressText : ''}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div>`;
-      container.appendChild(card);
-    });
-    document.getElementById('home-screen')?.classList.add('hidden'); document.getElementById('section-screen')?.classList.remove('hidden');
-    let titleMap={books:"📖 Книги",series:"📺 Сериалы",movies:"🎬 Кино",travel:"✈️ Путешествия",articles:"📰 Статьи",wishlist:"💖 WishList"}; 
-    let filterInfo = ''; if(currentSearchQuery) filterInfo += ` 🔍 "${currentSearchQuery}"`; if(currentSelectedTag) filterInfo += ` 🏷️ #${currentSelectedTag}`;
-    let titleElem = document.getElementById('content-title'); if(titleElem) titleElem.innerHTML=titleMap[section]+` <span class="text-sm text-zinc-500">(${filteredItems.length}/${items.length})</span>${filterInfo ? `<span class="text-xs text-violet-400 ml-2">${filterInfo}</span>` : ''}`;
-  }
-
-  function deleteItem(section,id){ data[section]=data[section].filter(i=>i.id!==id); localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); updateMenuCounters(); showToast('🗑️ Удалено','info'); }
-  function switchSection(section){ 
-    currentSection=section; if(section !== 'home') currentCategory = section;
-    currentSearchQuery = ''; currentSelectedTag = null;
-    if(document.getElementById('search-input')) document.getElementById('search-input').value = '';
-    let titles={home:"🏠 Главная",books:"📚 Книги",series:"📺 Сериалы",movies:"🎬 Кино",travel:"✈️ Путешествия",articles:"📰 Статьи",wishlist:"💖 WishList"}; 
-    document.getElementById('header-title').innerText=titles[section]; 
-    if(section==='home'){ document.getElementById('home-screen')?.classList.remove('hidden'); document.getElementById('section-screen')?.classList.add('hidden'); } 
-    else { renderContent(section); document.getElementById('home-screen')?.classList.add('hidden'); document.getElementById('section-screen')?.classList.remove('hidden'); }
-    closeMobileSidebar(); 
-  }
-  function setActiveMenu(el){ document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active'); }
-  function toggleTheme(){ isDark=!isDark; let html=document.documentElement; if(isDark){ html.classList.remove('light'); html.classList.add('dark'); document.getElementById('theme-icon-header')?.classList.replace('fa-moon','fa-sun'); } else { html.classList.remove('dark'); html.classList.add('light'); document.getElementById('theme-icon-header')?.classList.replace('fa-sun','fa-moon'); } }
-  function toggleSidebarDesktop(){ if(window.innerWidth<=768) return; isCollapsed=!isCollapsed; let sidebar=document.getElementById('sidebar'),main=document.getElementById('main-content'),topIcon=document.querySelector('#toggle-btn-top i'),bottomIcon=document.getElementById('bottom-toggle-icon'),bottomText=document.getElementById('bottom-toggle-text'); if(isCollapsed){ sidebar.style.width='64px'; main.style.marginLeft='64px'; sidebar.classList.add('sidebar-collapsed'); document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='center';i.style.paddingLeft='0';i.style.paddingRight='0';}); if(topIcon) topIcon.className='fa-solid fa-chevron-right text-xl'; if(bottomText) bottomText.style.display='none'; if(bottomIcon) bottomIcon.className='fa-solid fa-chevron-right text-lg'; document.querySelector('.logo-text')?.classList.add('hidden'); } else { sidebar.style.width='260px'; main.style.marginLeft='260px'; sidebar.classList.remove('sidebar-collapsed'); document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='flex-start';i.style.paddingLeft='16px';i.style.paddingRight='16px';}); if(topIcon) topIcon.className='fa-solid fa-chevron-left text-xl'; if(bottomText) bottomText.style.display='inline-block'; if(bottomIcon) bottomIcon.className='fa-solid fa-chevron-left text-lg'; document.querySelector('.logo-text')?.classList.remove('hidden'); } }
-  function toggleMobileSidebar(){ document.body.classList.toggle('sidebar-mobile-open'); }
-  function closeMobileSidebar(){ document.body.classList.remove('sidebar-mobile-open'); }
-  function escapeHtml(str){ return String(str).replace(/[&<>]/g,function(m){if(m==='&') return '&amp;';if(m==='<') return '&lt;';if(m==='>') return '&gt;';return m;}); }
   
-  let textarea=document.getElementById('input'); if(textarea){ textarea.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,160)+'px';}); textarea.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}); }
-  let searchInput = document.getElementById('search-input'); if(searchInput){ searchInput.addEventListener('input', (e) => { currentSearchQuery = e.target.value; if(currentSection !== 'home') renderContent(currentSection); }); }
-  
-  window.addEventListener('DOMContentLoaded',()=>{ 
-    if(window.innerWidth>768){ let s=document.getElementById('sidebar'),m=document.getElementById('main-content'); s.style.width='64px'; m.style.marginLeft='64px'; s.classList.add('sidebar-collapsed'); isCollapsed=true; document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='center';i.style.paddingLeft='0';i.style.paddingRight='0';}); let bt=document.getElementById('bottom-toggle-text'); if(bt) bt.style.display='none'; document.querySelector('.logo-text')?.classList.add('hidden'); } 
-    initCategoryDropdown();
-    initStatusDropdown();
+  // ==================== CRUD OPERATIONS ====================
+  function sendMessage() {
+    const input = document.getElementById('input');
+    if (!input.value.trim()) return;
+    const newItem = { id: Date.now(), text: input.value.trim(), date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }), rating: 0, tags: [], posterUrl: '', status: 'planned', progress: 0, author: '' };
+    data[currentCategory].unshift(newItem);
+    saveToLocal();
+    if (currentSection === currentCategory) renderContent(currentCategory);
     updateMenuCounters();
-    switchSection('home'); 
+    input.value = '';
+    input.style.height = 'auto';
+    showToast(`➕ Добавлено в ${SECTION_NAMES[currentCategory]}`);
+  }
+  
+  function deleteItem(section, id) {
+    data[section] = data[section].filter(i => i.id !== id);
+    saveToLocal();
+    if (currentSection === section) renderContent(section);
+    updateMenuCounters();
+    showToast('🗑️ Удалено', 'info');
+  }
+  
+  function updateRating(section, id, newRating) {
+    const item = data[section].find(i => i.id === id);
+    if (item) { item.rating = newRating; saveToLocal(); if (currentSection === section) renderContent(section); showToast(`⭐ Рейтинг: ${newRating}`); }
+  }
+  
+  function openEdit(section, id) {
+    const item = data[section].find(i => i.id === id);
+    if (!item) return;
+    currentEditItem = { section, id };
+    document.getElementById('edit-title').value = item.text || '';
+    document.getElementById('edit-author').value = item.author || '';
+    document.getElementById('edit-tags').value = (item.tags || []).join(', ');
+    document.getElementById('edit-poster').value = item.posterUrl || '';
+    document.getElementById('edit-progress').value = item.progress || 0;
+    currentStatusValue = item.status || 'planned';
+    const statusInfo = STATUS_MAP[currentStatusValue];
+    document.getElementById('selected-status-text').innerHTML = `<i class="${statusInfo.icon}"></i> ${statusInfo.text}`;
+    document.querySelectorAll('#status-menu .dropdown-item').forEach(i => { i.classList.remove('selected'); if (i.getAttribute('data-status') === currentStatusValue) i.classList.add('selected'); });
+    
+    const isBooks = section === 'books';
+    document.getElementById('progress-field-container').style.display = isBooks ? 'none' : 'flex';
+    document.getElementById('edit-author').style.display = isBooks ? 'flex' : 'none';
+    if (isBooks) document.getElementById('edit-author').placeholder = 'Автор книги';
+    document.getElementById('edit-modal').classList.remove('hidden');
+    if (window.innerWidth <= 768) closeMobileSidebar();
+  }
+  
+  function saveEdit() {
+    if (!currentEditItem) return;
+    const { section, id } = currentEditItem;
+    const item = data[section].find(i => i.id === id);
+    if (!item) return;
+    item.text = document.getElementById('edit-title').value;
+    if (section === 'books') item.author = document.getElementById('edit-author').value;
+    const tagsStr = document.getElementById('edit-tags').value;
+    item.tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+    item.posterUrl = document.getElementById('edit-poster').value;
+    item.status = currentStatusValue;
+    if (section !== 'books') item.progress = parseInt(document.getElementById('edit-progress').value) || 0;
+    saveToLocal();
+    if (currentSection === section) renderContent(section);
+    updateMenuCounters();
+    showToast('✏️ Запись обновлена', 'success');
+    closeModal();
+  }
+  
+  function closeModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+  
+  // ==================== FILTERS ====================
+  function filterByTag(tag) { currentSelectedTag = currentSelectedTag === tag ? null : tag; renderContent(currentSection); }
+  function clearFilters() { currentSearchQuery = ''; currentSelectedTag = null; document.getElementById('search-input').value = ''; renderContent(currentSection); showToast('Фильтры сброшены', 'info'); }
+  
+  // ==================== EXPORT / IMPORT ====================
+  function exportData(format) {
+    const allItems = [];
+    SECTIONS.forEach(cat => data[cat].forEach(item => allItems.push({ category: cat, title: item.text, author: item.author || '', date: item.date, rating: item.rating || 0, tags: (item.tags || []).join(', '), status: item.status || 'planned', progress: item.progress || 0, poster: item.posterUrl || '' })));
+    let content, ext, type;
+    if (format === 'json') { content = JSON.stringify({ version: '2.2', exportDate: new Date(), data }, null, 2); ext = 'json'; type = 'application/json'; showToast('✅ JSON экспортирован'); }
+    else if (format === 'csv') {
+      const headers = ['Категория', 'Название', 'Автор', 'Дата', 'Рейтинг', 'Теги', 'Статус', 'Прогресс', 'Постер'];
+      const rows = [headers, ...allItems.map(i => [i.category, i.title, i.author, i.date, i.rating, i.tags, i.status, i.progress, i.poster])];
+      content = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+      ext = 'csv'; type = 'text/csv;charset=utf-8;'; content = '\uFEFF' + content; showToast('📊 CSV экспортирован');
+    } else {
+      let txt = '=== MYGIT ТРЕКЕР КОНТЕНТА ===\n\n';
+      allItems.forEach(i => { txt += `[${i.category.toUpperCase()}] ${i.title}${i.author ? ' — ' + i.author : ''}\n   Дата: ${i.date} | Рейтинг: ${i.rating}⭐ | Статус: ${i.status} | Прогресс: ${i.progress}\n   Теги: ${i.tags || 'нет'} | Постер: ${i.poster || 'нет'}\n\n`; });
+      content = txt; ext = 'txt'; type = 'text/plain'; showToast('📄 TXT экспортирован');
+    }
+    const blob = new Blob([content], { type });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `mygit_${new Date().toISOString().slice(0, 19)}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  
+  function importData(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        const newData = imported.data || imported;
+        if (newData.books && newData.series && newData.movies && newData.wishlist) data = newData;
+        else throw new Error();
+        SECTIONS.forEach(s => { localStorage.setItem(s, JSON.stringify(data[s] || [])); if (!data[s]) data[s] = []; });
+        if (currentSection !== 'home') renderContent(currentSection);
+        updateMenuCounters();
+        showToast('📦 Импорт успешен');
+        input.value = '';
+      } catch (err) { showToast('Ошибка импорта', 'error'); input.value = ''; }
+    };
+    reader.readAsText(file);
+  }
+  
+  // ==================== NAVIGATION & UI ====================
+  function switchSection(section) {
+    currentSection = section;
+    if (section !== 'home') currentCategory = section;
+    currentSearchQuery = ''; currentSelectedTag = null;
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
+    document.getElementById('header-title').innerText = { home: '🏠 Главная', ...SECTION_NAMES }[section];
+    if (section === 'home') {
+      document.getElementById('home-screen')?.classList.remove('hidden');
+      document.getElementById('section-screen')?.classList.add('hidden');
+    } else {
+      renderContent(section);
+      document.getElementById('home-screen')?.classList.add('hidden');
+      document.getElementById('section-screen')?.classList.remove('hidden');
+    }
+    closeMobileSidebar();
+  }
+  
+  function setActiveMenu(el) { document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active')); if (el) el.classList.add('active'); }
+  function toggleTheme() { isDark = !isDark; document.documentElement.classList.toggle('light', !isDark); document.documentElement.classList.toggle('dark', isDark); const icon = document.getElementById('theme-icon-header'); if (icon) icon.className = `fa-solid ${isDark ? 'fa-sun' : 'fa-moon'} text-xl`; }
+  function toggleSidebarDesktop() {
+    if (window.innerWidth <= 768) return;
+    isCollapsed = !isCollapsed;
+    const sidebar = document.getElementById('sidebar'), main = document.getElementById('main-content');
+    const topIcon = document.querySelector('#toggle-btn-top i'), bottomText = document.getElementById('bottom-toggle-text'), bottomIcon = document.getElementById('bottom-toggle-icon');
+    if (isCollapsed) {
+      sidebar.style.width = '64px'; main.style.marginLeft = '64px'; sidebar.classList.add('sidebar-collapsed');
+      document.querySelectorAll('.menu-item').forEach(i => { i.style.justifyContent = 'center'; i.style.paddingLeft = '0'; i.style.paddingRight = '0'; });
+      if (topIcon) topIcon.className = 'fa-solid fa-chevron-right text-xl';
+      if (bottomText) bottomText.style.display = 'none';
+      if (bottomIcon) bottomIcon.className = 'fa-solid fa-chevron-right text-lg';
+      document.querySelector('.logo-text')?.classList.add('hidden');
+    } else {
+      sidebar.style.width = '260px'; main.style.marginLeft = '260px'; sidebar.classList.remove('sidebar-collapsed');
+      document.querySelectorAll('.menu-item').forEach(i => { i.style.justifyContent = 'flex-start'; i.style.paddingLeft = '16px'; i.style.paddingRight = '16px'; });
+      if (topIcon) topIcon.className = 'fa-solid fa-chevron-left text-xl';
+      if (bottomText) bottomText.style.display = 'inline-block';
+      if (bottomIcon) bottomIcon.className = 'fa-solid fa-chevron-left text-lg';
+      document.querySelector('.logo-text')?.classList.remove('hidden');
+    }
+  }
+  function toggleMobileSidebar() { document.body.classList.toggle('sidebar-mobile-open'); }
+  function closeMobileSidebar() { document.body.classList.remove('sidebar-mobile-open'); }
+  
+  // ==================== INITIALIZATION ====================
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth > 768) {
+      document.getElementById('sidebar').style.width = '64px';
+      document.getElementById('main-content').style.marginLeft = '64px';
+      document.getElementById('sidebar').classList.add('sidebar-collapsed');
+      document.querySelectorAll('.menu-item').forEach(i => { i.style.justifyContent = 'center'; i.style.paddingLeft = '0'; i.style.paddingRight = '0'; });
+      document.getElementById('bottom-toggle-text').style.display = 'none';
+      document.querySelector('.logo-text')?.classList.add('hidden');
+    }
+    initDropdown('dropdown-button', 'dropdown-menu', '#dropdown-menu .dropdown-item', (val, item) => { currentCategory = val; const icon = item.querySelector('i').cloneNode(true); document.getElementById('selected-category-text').innerHTML = icon.outerHTML + ' ' + item.textContent.trim(); }, i => i.getAttribute('data-value'));
+    initDropdown('status-button', 'status-menu', '#status-menu .dropdown-item', (val) => { currentStatusValue = val; const info = STATUS_MAP[val]; document.getElementById('selected-status-text').innerHTML = `<i class="${info.icon}"></i> ${info.text}`; }, i => i.getAttribute('data-status'));
+    updateMenuCounters();
+    switchSection('home');
+    const textarea = document.getElementById('input');
+    if (textarea) {
+      textarea.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 160) + 'px'; });
+      textarea.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+    }
+    document.getElementById('search-input')?.addEventListener('input', e => { currentSearchQuery = e.target.value; if (currentSection !== 'home') renderContent(currentSection); });
   });
 </script>
 </body>
