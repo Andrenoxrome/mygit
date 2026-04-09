@@ -79,7 +79,7 @@
     html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
     html.light .menu-item.active i { color: #7c3aed; }
     
-    /* Responsive */
+    /* Responsive - кнопка отправки на всю ширину на мобилках */
     @media (max-width: 768px) {
       #main-content { margin-left: 0 !important; }
       #sidebar { transform: translateX(-100%); width: 260px !important; position: fixed; border-radius: 0 32px 32px 0; }
@@ -94,8 +94,30 @@
       #sidebar .menu-item i { margin: 0 16px 0 0 !important; }
       .custom-dropdown { width: 100%; }
       .dropdown-items { max-height: 200px; }
+      /* Кнопка отправки на всю ширину на мобилках */
+      .send-button-full {
+        width: 100% !important;
+        margin-top: 8px;
+      }
+      .input-row-mobile {
+        flex-direction: column !important;
+      }
+      .send-button-full button {
+        width: 100% !important;
+        height: 48px !important;
+        border-radius: 28px !important;
+      }
+      .custom-dropdown {
+        width: 100%;
+      }
     }
-    @media (min-width: 769px) { .sidebar-overlay, .mobile-menu-toggle { display: none; } }
+    @media (min-width: 769px) { 
+      .sidebar-overlay, .mobile-menu-toggle { display: none; }
+      .send-button-full {
+        width: auto !important;
+        margin-top: 0;
+      }
+    }
     
     .mobile-menu-toggle { background: transparent; border: none; cursor: pointer; }
     #sidebar::-webkit-scrollbar { display: none; }
@@ -162,8 +184,8 @@
         <p class="text-zinc-500 text-xs md:text-sm mt-3">Книги, сериалы, кино, путешествия, статьи — с рейтингом, тегами и прогрессом</p>
       </div>
       <div class="w-full">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 gap-2 shadow-xl">
-          <div class="custom-dropdown" id="category-dropdown">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 gap-2 shadow-xl input-row-mobile">
+          <div class="custom-dropdown w-full sm:w-auto">
             <div class="dropdown-button" id="dropdown-button"><span id="selected-category-text">📚 Книги</span><i class="fa-solid fa-chevron-down dropdown-icon"></i></div>
             <div class="dropdown-menu" id="dropdown-menu"><div class="dropdown-items">
               <div class="dropdown-item selected" data-value="books"><i class="fa-solid fa-book"></i> Книги</div>
@@ -175,7 +197,7 @@
             </div></div>
           </div>
           <div class="flex-1 relative"><textarea id="input" rows="1" class="w-full bg-transparent border-0 focus:outline-none text-base py-3 px-3 resize-none placeholder-zinc-500" placeholder="Название..."></textarea></div>
-          <button onclick="sendMessage()" class="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 w-11 h-11 flex items-center justify-center rounded-2xl transition-all active:scale-95 shadow-lg"><i class="fa-solid fa-paper-plane text-white"></i></button>
+          <div class="send-button-full"><button onclick="sendMessage()" class="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 w-11 h-11 flex items-center justify-center rounded-2xl transition-all active:scale-95 shadow-lg"><i class="fa-solid fa-paper-plane text-white"></i></button></div>
         </div>
         <p class="text-xs text-zinc-500 mt-3 text-center">Нажмите Enter, чтобы добавить</p>
       </div>
