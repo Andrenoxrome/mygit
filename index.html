@@ -9,29 +9,59 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #0a0a0f; overflow-x: hidden; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
     
-    /* Sidebar */
-    #sidebar, .menu-text, #logo-text, .menu-item i, .menu-item span { transition: all 0.2s ease-in-out; }
-    #sidebar { border-top-right-radius: 32px; border-bottom-right-radius: 32px; overflow-y: hidden !important; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3); z-index: 1000; transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.3s ease; display: flex; flex-direction: column; }
-    .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px; border-bottom: 1px solid rgba(63, 63, 70, 0.5); transition: all 0.2s; }
+    /* ===== САЙДБАР ===== */
+    #sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      background: #18181b;
+      border-right: 1px solid #3f3f46;
+      border-top-right-radius: 32px;
+      border-bottom-right-radius: 32px;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: hidden;
+    }
+    
+    #sidebar.collapsed { width: 72px; }
+    #sidebar.collapsed .logo-text,
+    #sidebar.collapsed .menu-text,
+    #sidebar.collapsed .bottom-text { display: none !important; }
+    #sidebar.collapsed .menu-item { justify-content: center !important; padding: 12px 0 !important; }
+    #sidebar.collapsed .menu-item i { margin: 0 auto !important; }
+    #sidebar.collapsed .menu-counter { display: none !important; }
+    #sidebar.collapsed .sidebar-header { justify-content: center !important; padding: 20px 0 !important; }
+    #sidebar.collapsed .logo-area { justify-content: center !important; width: 100%; }
+    
+    #sidebar:not(.collapsed) { width: 260px; }
+    #sidebar:not(.collapsed) .logo-text { display: inline-block !important; }
+    #sidebar:not(.collapsed) .menu-text { display: inline-block !important; }
+    #sidebar:not(.collapsed) .bottom-text { display: inline-block !important; }
+    #sidebar:not(.collapsed) .menu-item { justify-content: flex-start !important; padding: 10px 16px !important; }
+    #sidebar:not(.collapsed) .menu-item i { margin-right: 12px !important; width: 20px; }
+    #sidebar:not(.collapsed) .menu-counter { display: inline-block !important; }
+    #sidebar:not(.collapsed) .sidebar-header { justify-content: space-between !important; padding: 20px 16px !important; }
+    
+    .sidebar-header { display: flex; align-items: center; transition: all 0.2s; border-bottom: 1px solid rgba(63, 63, 70, 0.5); }
     .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; transition: all 0.2s; }
-    .sidebar-collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
-    .sidebar-collapsed .logo-area { justify-content: center; width: 100%; }
-    .sidebar-collapsed .logo-text { display: none; }
-    .sidebar-collapsed .menu-text { display: none; }
-    .sidebar-collapsed .menu-item { justify-content: center; padding: 12px 0 !important; }
-    .sidebar-collapsed .menu-item i { margin: 0 auto; }
-    .sidebar-collapsed .menu-counter { display: none; }
+    .toggle-btn { background: transparent; border: none; cursor: pointer; color: #a1a1aa; transition: all 0.2s; padding: 8px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .toggle-btn:hover { background: #27272a; color: white; }
     
     .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
     body.sidebar-mobile-open .sidebar-overlay { opacity: 1; visibility: visible; }
-    .menu-item { border-radius: 20px; margin: 4px 0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s; padding: 10px 16px; }
+    body.sidebar-mobile-open #sidebar { transform: translateX(0) !important; }
+    
+    .menu-item { border-radius: 20px; margin: 4px 8px; display: flex; align-items: center; cursor: pointer; transition: all 0.2s; }
     .menu-item:hover { transform: translateX(2px); background: #2c2c3a; }
     .menu-item.active { background: linear-gradient(135deg, #2c2c3a 0%, #23232e 100%); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .menu-item.active i { color: #c084fc; text-shadow: 0 0 4px rgba(192,132,252,0.3); }
-    .menu-counter { margin-left: auto; background: rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: #c084fc; transition: all 0.2s; }
+    .menu-counter { margin-left: auto; background: rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: #c084fc; }
+    
     .rating-star { cursor: pointer; transition: transform 0.1s; }
     .rating-star:hover { transform: scale(1.15); }
     .rating-star-active { color: #fbbf24; }
@@ -79,60 +109,57 @@
     html.light .menu-item.active { background: linear-gradient(135deg, #e9e9f0 0%, #e0e0e8 100%); }
     html.light .menu-item.active i { color: #7c3aed; }
     
-    /* Responsive - кнопка отправки на всю ширину на мобилках */
+    /* Массовое выделение */
+    .card-checkbox { position: absolute; left: 12px; top: 12px; width: 20px; height: 20px; cursor: pointer; z-index: 10; }
+    .content-card { position: relative; transition: all 0.2s; border-radius: 24px; }
+    .content-card.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); transform: translateX(4px); }
+    .content-card .card-content { margin-left: 28px; }
+    .batch-actions-bar { position: sticky; top: 56px; z-index: 45; background: #1f1f2e; border-radius: 60px; padding: 8px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; border: 1px solid #3f3f46; backdrop-filter: blur(8px); }
+    html.light .batch-actions-bar { background: #ffffff; border-color: #e4e4e7; }
+    .batch-mode-btn { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border: none; padding: 8px 16px; border-radius: 40px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .batch-mode-btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); }
+    .search-cover-btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 10px 16px; border-radius: 28px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .search-cover-btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }
+    .cover-preview { margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .cover-preview img { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    
+    /* Модальное окно подтверждения */
+    .confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 300; transition: all 0.2s; }
+    .confirm-modal-content { background: #1f1f2e; border-radius: 32px; padding: 24px; max-width: 400px; width: 90%; border: 1px solid #3f3f46; box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5); }
+    html.light .confirm-modal-content { background: #ffffff; border-color: #e4e4e7; }
+    
+    /* Responsive */
     @media (max-width: 768px) {
       #main-content { margin-left: 0 !important; }
       #sidebar { transform: translateX(-100%); width: 260px !important; position: fixed; border-radius: 0 32px 32px 0; }
       body.sidebar-mobile-open #sidebar { transform: translateX(0); }
       .sidebar-overlay { display: block; }
       .mobile-menu-toggle { display: flex; }
-      .menu-text { display: inline-block !important; }
-      .menu-counter { display: inline-block !important; }
-      .logo-text { display: inline-block !important; }
-      #toggle-btn-top, #toggle-btn-bottom { display: none; }
-      #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; padding-right: 16px !important; }
-      #sidebar .menu-item i { margin: 0 16px 0 0 !important; }
       .custom-dropdown { width: 100%; }
       .dropdown-items { max-height: 200px; }
-      /* Кнопка отправки на всю ширину на мобилках */
-      .send-button-full {
-        width: 100% !important;
-        margin-top: 8px;
-      }
-      .input-row-mobile {
-        flex-direction: column !important;
-      }
-      .send-button-full button {
-        width: 100% !important;
-        height: 48px !important;
-        border-radius: 28px !important;
-      }
-      .custom-dropdown {
-        width: 100%;
-      }
+      .send-button-full { width: 100% !important; margin-top: 8px; }
+      .input-row-mobile { flex-direction: column !important; }
+      .send-button-full button { width: 100% !important; height: 48px !important; border-radius: 28px !important; }
+      .batch-actions-bar { top: 56px; border-radius: 28px; }
+      #sidebar .menu-item { justify-content: flex-start !important; padding-left: 16px !important; }
+      #sidebar .menu-item i { margin-right: 12px !important; }
     }
     @media (min-width: 769px) { 
       .sidebar-overlay, .mobile-menu-toggle { display: none; }
-      .send-button-full {
-        width: auto !important;
-        margin-top: 0;
-      }
+      .send-button-full { width: auto !important; margin-top: 0; }
     }
     
     .mobile-menu-toggle { background: transparent; border: none; cursor: pointer; }
     #sidebar::-webkit-scrollbar { display: none; }
     #sidebar { -ms-overflow-style: none; scrollbar-width: none; }
-    .content-card { transition: all 0.2s; border-radius: 24px; }
     .content-card:hover { border-color: #8b5cf6; transform: translateY(-2px); }
     .toast-notification { animation: slideIn 0.3s ease-out; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .search-input { transition: all 0.2s; }
     .filter-tags-container { max-height: 80px; overflow-y: auto; scrollbar-width: thin; }
     
-    /* Логотип с иконкой fa-link (цепочка/связь) */
-    .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3), 0 0 0 2px rgba(255,255,255,0.1); transition: all 0.3s ease; position: relative; overflow: hidden; }
-    .logo-icon::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%); border-radius: 20px; }
-    .logo-icon i { font-size: 1.4rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1; }
+    .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3), 0 0 0 2px rgba(255,255,255,0.1); transition: all 0.3s ease; }
+    .logo-icon i { font-size: 1.4rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .logo-icon:hover { transform: scale(1.02) rotate(2deg); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4); }
     .logo-text { font-size: 1.35rem; font-weight: 700; background: linear-gradient(135deg, #f4f4f5 0%, #c084fc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.3px; }
     html.light .logo-text { background: linear-gradient(135deg, #18181b 0%, #7c3aed 100%); -webkit-background-clip: text; background-clip: text; }
@@ -143,39 +170,47 @@
 <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- Sidebar -->
-<div id="sidebar" class="bg-zinc-900 border-r border-zinc-700 h-screen flex flex-col fixed left-0 top-0 transition-all duration-300 z-50" style="width: 260px">
+<div id="sidebar" class="collapsed">
   <div class="sidebar-header">
-    <div class="logo-area"><div class="logo-icon"><i class="fa-solid fa-link"></i></div><span id="logo-text" class="logo-text">MyTracker</span></div>
-    <button onclick="toggleSidebarDesktop()" id="toggle-btn-top" class="text-zinc-300 hover:text-white p-2 rounded-xl"><i class="fa-solid fa-chevron-right text-xl"></i></button>
+    <div class="logo-area">
+      <div class="logo-icon"><i class="fa-solid fa-link"></i></div>
+      <span class="logo-text">MyTracker</span>
+    </div>
+    <button onclick="toggleSidebar()" class="toggle-btn" id="toggle-sidebar-btn">
+      <i class="fa-solid fa-chevron-right text-xl"></i>
+    </button>
   </div>
-  <div class="flex-1 py-6 px-3 space-y-1.5">
-    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-house w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Главная</span></a>
-    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Книги</span><span id="counter-books" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Сериалы</span><span id="counter-series" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Кино</span><span id="counter-movies" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('travel'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-plane w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Путешествия</span><span id="counter-travel" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('articles'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-newspaper w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">Статьи</span><span id="counter-articles" class="menu-counter">0</span></a>
-    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium ml-4">WishList</span><span id="counter-wishlist" class="menu-counter">0</span></a>
+  <div class="flex-1 py-4 px-2 space-y-1">
+    <a href="#" onclick="switchSection('home'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-house w-5 h-5 text-zinc-400"></i><span class="menu-text text-sm font-medium">Главная</span></a>
+    <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-book w-5 h-5 text-zinc-400"></i><span class="menu-text text-sm font-medium">Книги</span><span id="counter-books" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-tv w-5 h-5 text-zinc-400"></i><span class="menu-text text-sm font-medium">Сериалы</span><span id="counter-series" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-film w-5 h-5 text-zinc-400"></i><span class="menu-text text-sm font-medium">Кино</span><span id="counter-movies" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('travel'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-plane w-5 h-5 text-zinc-400"></i><span class="menu-text text-sm font-medium">Путешествия</span><span id="counter-travel" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('articles'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-newspaper w-5 h-5 text-zinc-400"></i><span class="menu-text text-sm font-medium">Статьи</span><span id="counter-articles" class="menu-counter">0</span></a>
+    <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item"><i class="fa-solid fa-heart w-5 h-5 text-zinc-400"></i><span class="menu-text text-sm font-medium">WishList</span><span id="counter-wishlist" class="menu-counter">0</span></a>
   </div>
   <div class="p-4 border-t border-zinc-700/50">
-    <button onclick="toggleSidebarDesktop()" id="toggle-btn-bottom" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl"><i id="bottom-toggle-icon" class="fa-solid fa-chevron-right text-lg"></i><span id="bottom-toggle-text" class="menu-text text-sm">Свернуть меню</span></button>
+    <button onclick="toggleSidebar()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl transition-all hover:bg-zinc-800/50">
+      <i class="fa-solid fa-chevron-right text-lg"></i>
+      <span class="menu-text bottom-text text-sm">Свернуть меню</span>
+    </button>
   </div>
 </div>
 
 <!-- Main Content -->
-<div class="flex-1 flex flex-col h-screen ml-0 md:ml-16 transition-all duration-300" id="main-content">
+<div class="flex-1 flex flex-col h-screen ml-[72px] transition-all duration-300" id="main-content">
   <div class="h-14 border-b border-zinc-700 flex items-center px-4 md:px-6 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40 gap-2">
     <button onclick="toggleMobileSidebar()" class="mobile-menu-toggle text-zinc-400 hover:text-white p-2 -ml-2 rounded-xl md:hidden"><i class="fa-solid fa-bars text-2xl"></i></button>
     <div id="header-title" class="text-xl font-medium tracking-tight flex-1 truncate">Главная</div>
-    <button onclick="exportData('json')" class="text-zinc-400 hover:text-green-400 p-2 rounded-full transition-all hover:scale-110" title="Экспорт JSON"><i class="fa-solid fa-download text-xl"></i></button>
-    <button onclick="exportData('csv')" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full transition-all hover:scale-110" title="Экспорт CSV"><i class="fa-solid fa-table text-xl"></i></button>
-    <button onclick="exportData('txt')" class="text-zinc-400 hover:text-yellow-400 p-2 rounded-full transition-all hover:scale-110" title="Экспорт TXT"><i class="fa-solid fa-file-lines text-xl"></i></button>
+    <button onclick="exportData('json')" class="text-zinc-400 hover:text-green-400 p-2 rounded-full transition-all hover:scale-110"><i class="fa-solid fa-download text-xl"></i></button>
+    <button onclick="exportData('csv')" class="text-zinc-400 hover:text-blue-400 p-2 rounded-full transition-all hover:scale-110"><i class="fa-solid fa-table text-xl"></i></button>
+    <button onclick="exportData('txt')" class="text-zinc-400 hover:text-yellow-400 p-2 rounded-full transition-all hover:scale-110"><i class="fa-solid fa-file-lines text-xl"></i></button>
     <label for="import-file-input" class="text-zinc-400 hover:text-violet-400 p-2 rounded-full transition-all hover:scale-110 cursor-pointer"><i class="fa-solid fa-upload text-xl"></i></label>
     <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importData(this)">
     <button onclick="toggleTheme()" class="text-zinc-400 hover:text-white p-2 rounded-full transition-all hover:scale-110"><i id="theme-icon-header" class="fa-solid fa-sun text-xl"></i></button>
   </div>
 
-  <div class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto no-scrollbar">
+  <div class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 overflow-y-auto">
     <!-- Home Screen -->
     <div id="home-screen" class="w-full max-w-2xl mt-4 md:mt-12">
       <div class="text-center mb-6 md:mb-12">
@@ -207,7 +242,19 @@
     <div id="section-screen" class="w-full max-w-4xl hidden mt-4">
       <div class="search-filter-container mb-6 space-y-3">
         <div class="relative"><i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 text-sm"></i><input type="text" id="search-input" placeholder="Поиск по названию..." class="search-input w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-10 pr-4 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500 transition"></div>
-        <div class="flex flex-wrap items-center gap-2"><span class="text-xs text-zinc-500"><i class="fa-regular fa-tags"></i> Фильтр по тегам:</span><div id="filter-tags-list" class="filter-tags-container flex flex-wrap gap-2 flex-1"></div><button onclick="clearFilters()" class="text-xs text-zinc-500 hover:text-red-400 transition px-2 py-1 rounded-lg hover:bg-zinc-800"><i class="fa-regular fa-times-circle"></i> Сбросить</button></div>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 flex-wrap"><i class="fa-regular fa-tags text-zinc-500 text-sm"></i><span class="text-xs text-zinc-500">Фильтр по тегам:</span><div id="filter-tags-list" class="filter-tags-container flex flex-wrap gap-2"></div></div>
+          <button onclick="toggleBatchMode()" class="batch-mode-btn"><i class="fa-regular fa-square-check"></i> Массовое выделение</button>
+        </div>
+      </div>
+      <div id="batch-actions" class="batch-actions-bar" style="display: none;">
+        <span id="selected-count" class="text-sm font-medium">Выбрано: 0</span>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="selectAll()" class="bg-violet-600 hover:bg-violet-700 px-3 py-1.5 rounded-full text-sm transition flex items-center gap-1"><i class="fa-regular fa-check-square"></i> Все</button>
+          <button onclick="batchAddTag()" class="bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-full text-sm transition flex items-center gap-1"><i class="fa-regular fa-tag"></i> Тег</button>
+          <button onclick="showBatchDeleteConfirm()" class="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-full text-sm transition flex items-center gap-1"><i class="fa-regular fa-trash-can"></i> Удалить</button>
+          <button onclick="cancelBatchMode()" class="bg-zinc-700 hover:bg-zinc-600 px-3 py-1.5 rounded-full text-sm transition"><i class="fa-regular fa-times"></i> Отмена</button>
+        </div>
       </div>
       <div id="content-list" class="space-y-4 pb-10"></div>
     </div>
@@ -216,14 +263,33 @@
 
 <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 z-[100] flex flex-col gap-2 w-full max-w-[90%] md:max-w-md"></div>
 
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="confirm-modal" style="display: none;">
+  <div class="confirm-modal-content">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center"><i class="fa-solid fa-trash-can text-red-500 text-xl"></i></div>
+      <h3 class="text-xl font-semibold">Подтверждение удаления</h3>
+    </div>
+    <p id="confirm-message" class="text-zinc-400 mb-6">Вы уверены, что хотите удалить этот элемент?</p>
+    <div class="flex gap-3">
+      <button id="confirm-yes" class="flex-1 bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-medium transition">Удалить</button>
+      <button id="confirm-no" class="flex-1 bg-zinc-700 hover:bg-zinc-600 py-2.5 rounded-xl font-medium transition">Отмена</button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Modal -->
 <div id="edit-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[200] hidden transition-all" style="backdrop-filter: blur(4px);">
   <div class="bg-zinc-900 rounded-3xl w-full max-w-lg mx-4 p-6 border border-zinc-700 shadow-2xl">
     <h3 class="text-xl font-semibold mb-4 flex items-center gap-2"><i class="fa-solid fa-pen text-violet-400"></i> Редактировать</h3>
     <input type="text" id="edit-title" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Название">
-    <input type="text" id="edit-author" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Автор">
+    <input type="text" id="edit-author" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Автор / Режиссёр">
     <input type="text" id="edit-tags" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Теги (через запятую)">
-    <input type="text" id="edit-poster" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="URL обложки/постера">
+    <div class="flex gap-2 mb-3">
+      <input type="text" id="edit-poster" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="URL обложки/постера">
+      <button onclick="searchCover()" class="search-cover-btn" id="search-cover-btn"><i class="fa-solid fa-magnifying-glass"></i> Найти обложку</button>
+    </div>
+    <div id="cover-preview" class="cover-preview mb-3"></div>
     <div class="custom-dropdown w-full mb-3" id="status-dropdown">
       <div class="dropdown-button" id="status-button"><span id="selected-status-text">📅 В планах</span><i class="fa-solid fa-chevron-down dropdown-icon"></i></div>
       <div class="dropdown-menu" id="status-menu"><div class="dropdown-items">
@@ -238,7 +304,66 @@
   </div>
 </div>
 
+<!-- Batch Tag Modal -->
+<div id="batch-tag-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[200] hidden transition-all" style="backdrop-filter: blur(4px);">
+  <div class="bg-zinc-900 rounded-3xl w-full max-w-md mx-4 p-6 border border-zinc-700 shadow-2xl">
+    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2"><i class="fa-regular fa-tag text-violet-400"></i> Добавить тег ко всем выбранным</h3>
+    <input type="text" id="batch-tag-input" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 mb-4 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-500" placeholder="Название тега">
+    <div class="flex gap-3"><button onclick="confirmBatchAddTag()" class="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 py-3 rounded-xl font-medium transition">Добавить</button><button onclick="closeBatchTagModal()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 py-3 rounded-xl transition">Отмена</button></div>
+  </div>
+</div>
+
 <script>
+  // ==================== CONFIRM MODAL ====================
+  let pendingDelete = null;
+  
+  function showConfirmModal(message, onConfirm) {
+    const modal = document.getElementById('confirm-modal');
+    const messageEl = document.getElementById('confirm-message');
+    const yesBtn = document.getElementById('confirm-yes');
+    const noBtn = document.getElementById('confirm-no');
+    
+    messageEl.textContent = message;
+    modal.style.display = 'flex';
+    
+    const handleYes = () => {
+      modal.style.display = 'none';
+      yesBtn.removeEventListener('click', handleYes);
+      noBtn.removeEventListener('click', handleNo);
+      onConfirm();
+    };
+    
+    const handleNo = () => {
+      modal.style.display = 'none';
+      yesBtn.removeEventListener('click', handleYes);
+      noBtn.removeEventListener('click', handleNo);
+    };
+    
+    yesBtn.addEventListener('click', handleYes);
+    noBtn.addEventListener('click', handleNo);
+  }
+
+  // ==================== SIDEBAR TOGGLE ====================
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    const toggleIcon = document.querySelector('#toggle-sidebar-btn i');
+    const bottomIcon = document.querySelector('#sidebar .border-t .fa-chevron-right');
+    
+    if (isCollapsed) {
+      sidebar.classList.remove('collapsed');
+      mainContent.style.marginLeft = '260px';
+      if (toggleIcon) { toggleIcon.classList.remove('fa-chevron-right'); toggleIcon.classList.add('fa-chevron-left'); }
+      if (bottomIcon) { bottomIcon.classList.remove('fa-chevron-right'); bottomIcon.classList.add('fa-chevron-left'); }
+    } else {
+      sidebar.classList.add('collapsed');
+      mainContent.style.marginLeft = '72px';
+      if (toggleIcon) { toggleIcon.classList.remove('fa-chevron-left'); toggleIcon.classList.add('fa-chevron-right'); }
+      if (bottomIcon) { bottomIcon.classList.remove('fa-chevron-left'); bottomIcon.classList.add('fa-chevron-right'); }
+    }
+  }
+
   // ==================== CONSTANTS & STATE ====================
   const SECTIONS = ['books', 'series', 'movies', 'travel', 'articles', 'wishlist'];
   const SECTION_NAMES = { books: '📖 Книги', series: '📺 Сериалы', movies: '🎬 Кино', travel: '✈️ Путешествия', articles: '📰 Статьи', wishlist: '💖 WishList' };
@@ -247,7 +372,80 @@
   let data = {};
   SECTIONS.forEach(s => { data[s] = JSON.parse(localStorage.getItem(s)) || []; });
   
-  let currentSection = 'home', currentCategory = 'books', currentSearchQuery = '', currentSelectedTag = null, currentStatusValue = 'planned', currentEditItem = null, isDark = true, isCollapsed = true;
+  let currentSection = 'home', currentCategory = 'books', currentSearchQuery = '', currentSelectedTag = null, currentStatusValue = 'planned', currentEditItem = null, isDark = true;
+  let batchMode = false;
+  let selectedItems = new Set();
+
+  // ==================== УНИВЕРСАЛЬНЫЙ ПОИСК ОБЛОЖЕК ====================
+  async function searchCover() {
+    const title = document.getElementById('edit-title').value.trim();
+    const section = currentEditItem?.section;
+    if (!title) { showToast('Введите название', 'error'); return; }
+    showToast('🔍 Ищем обложку...', 'info');
+    if (section === 'books') await searchBookCover(title);
+    else if (section === 'movies' || section === 'series') await searchMovieCover(title, section);
+    else showToast('Поиск обложек доступен для книг, фильмов и сериалов', 'error');
+  }
+  
+  async function searchBookCover(title) {
+    const author = document.getElementById('edit-author').value.trim();
+    const previewContainer = document.getElementById('cover-preview');
+    let query = `intitle:${encodeURIComponent(title)}`;
+    if (author) query += `+inauthor:${encodeURIComponent(author)}`;
+    try {
+      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=5&langRestrict=ru`);
+      const result = await response.json();
+      if (!result.items || result.items.length === 0) { showToast('Обложки не найдены', 'error'); previewContainer.innerHTML = ''; return; }
+      previewContainer.innerHTML = '<div class="text-xs text-zinc-400 mb-2">Выберите обложку:</div><div class="flex flex-wrap gap-2">';
+      result.items.forEach(item => {
+        const coverUrl = item.volumeInfo.imageLinks?.thumbnail || '';
+        if (coverUrl) {
+          previewContainer.innerHTML += `<div class="cursor-pointer border-2 border-transparent hover:border-violet-500 rounded-xl p-1 transition-all" onclick="selectCover('${coverUrl.replace(/'/g, "\\'")}')"><img src="${coverUrl}" class="w-20 h-28 object-cover rounded-lg shadow-md"><p class="text-xs text-zinc-400 mt-1 max-w-[80px] truncate">${escapeHtml(item.volumeInfo.title || '')}</p></div>`;
+        }
+      });
+      previewContainer.innerHTML += '</div>';
+      showToast('✅ Найдены обложки', 'success');
+    } catch (error) { showToast('Ошибка поиска', 'error'); }
+  }
+  
+  async function searchMovieCover(title, type) {
+    const previewContainer = document.getElementById('cover-preview');
+    const movieType = type === 'movies' ? 'movie' : 'series';
+    const API_KEY = '8f97b8e9';
+    try {
+      const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&type=${movieType}&apikey=${API_KEY}`);
+      const result = await response.json();
+      if (result.Response === 'False') {
+        const response2 = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(title)}&apikey=${API_KEY}`);
+        const result2 = await response2.json();
+        if (result2.Response === 'True' && result2.Search) {
+          previewContainer.innerHTML = '<div class="text-xs text-zinc-400 mb-2">Найдено несколько результатов:</div><div class="flex flex-wrap gap-2">';
+          for (let i = 0; i < Math.min(result2.Search.length, 5); i++) {
+            const detailsResponse = await fetch(`https://www.omdbapi.com/?i=${result2.Search[i].imdbID}&apikey=${API_KEY}`);
+            const details = await detailsResponse.json();
+            const posterUrl = details.Poster !== 'N/A' ? details.Poster : '';
+            if (posterUrl) {
+              previewContainer.innerHTML += `<div class="cursor-pointer border-2 border-transparent hover:border-violet-500 rounded-xl p-1 transition-all" onclick="selectCover('${posterUrl.replace(/'/g, "\\'")}')"><img src="${posterUrl}" class="w-20 h-28 object-cover rounded-lg shadow-md"><p class="text-xs text-zinc-400 mt-1 max-w-[80px] truncate">${escapeHtml(details.Title)}</p></div>`;
+            }
+          }
+          previewContainer.innerHTML += '</div>';
+          showToast('✅ Найдены постеры', 'success');
+        } else { showToast('Постер не найден', 'error'); previewContainer.innerHTML = ''; }
+        return;
+      }
+      const posterUrl = result.Poster !== 'N/A' ? result.Poster : '';
+      if (posterUrl) {
+        previewContainer.innerHTML = `<div class="cursor-pointer border-2 border-violet-500 rounded-xl p-1 transition-all" onclick="selectCover('${posterUrl.replace(/'/g, "\\'")}')"><img src="${posterUrl}" class="w-20 h-28 object-cover rounded-lg shadow-md"><p class="text-xs text-zinc-400 mt-1">${escapeHtml(result.Title)} (${result.Year || '?'})</p></div>`;
+        showToast('✅ Найден постер', 'success');
+      } else { showToast('Постер не найден', 'error'); }
+    } catch (error) { showToast('Ошибка поиска', 'error'); }
+  }
+  
+  function selectCover(url) {
+    document.getElementById('edit-poster').value = url;
+    document.getElementById('cover-preview').innerHTML = `<div class="flex items-center gap-2 text-green-400 text-sm"><i class="fa-solid fa-check-circle"></i> Обложка установлена!</div>`;
+    showToast('Обложка установлена', 'success');
+  }
 
   // ==================== UTILITIES ====================
   const showToast = (msg, type = 'success') => {
@@ -263,6 +461,78 @@
   const escapeHtml = str => String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
   const saveToLocal = () => SECTIONS.forEach(s => localStorage.setItem(s, JSON.stringify(data[s])));
   const updateMenuCounters = () => SECTIONS.forEach(s => { const el = document.getElementById(`counter-${s}`); if (el) el.innerText = data[s].length; });
+  
+  // ==================== BATCH MODE ====================
+  function toggleBatchMode() {
+    batchMode = !batchMode;
+    selectedItems.clear();
+    const batchBar = document.getElementById('batch-actions');
+    batchBar.style.display = batchMode ? 'flex' : 'none';
+    if (batchMode) showToast('Режим массового выделения включен', 'info');
+    renderContent(currentSection);
+  }
+  
+  function toggleSelectItem(id) {
+    if (selectedItems.has(id)) selectedItems.delete(id);
+    else selectedItems.add(id);
+    document.getElementById('selected-count').innerText = `Выбрано: ${selectedItems.size}`;
+    const card = document.querySelector(`.content-card[data-id="${id}"]`);
+    if (card) card.classList.toggle('selected', selectedItems.has(id));
+  }
+  
+  function selectAll() {
+    data[currentSection].forEach(item => selectedItems.add(item.id));
+    document.getElementById('selected-count').innerText = `Выбрано: ${selectedItems.size}`;
+    renderContent(currentSection);
+    showToast(`✅ Выбрано ${selectedItems.size} элементов`, 'info');
+  }
+  
+  function showBatchDeleteConfirm() {
+    if (selectedItems.size === 0) { showToast('Нет выбранных элементов', 'error'); return; }
+    showConfirmModal(`Удалить ${selectedItems.size} выбранных элемент(ов)? Это действие нельзя отменить.`, () => {
+      const count = selectedItems.size;
+      data[currentSection] = data[currentSection].filter(item => !selectedItems.has(item.id));
+      saveToLocal();
+      selectedItems.clear();
+      updateMenuCounters();
+      renderContent(currentSection);
+      showToast(`🗑️ Удалено ${count} элементов`, 'success');
+      if (selectedItems.size === 0 && batchMode) toggleBatchMode();
+    });
+  }
+  
+  function batchAddTag() {
+    if (selectedItems.size === 0) { showToast('Нет выбранных элементов', 'error'); return; }
+    document.getElementById('batch-tag-modal').classList.remove('hidden');
+  }
+  
+  function closeBatchTagModal() {
+    document.getElementById('batch-tag-modal').classList.add('hidden');
+    document.getElementById('batch-tag-input').value = '';
+  }
+  
+  function confirmBatchAddTag() {
+    const tag = document.getElementById('batch-tag-input').value.trim();
+    if (!tag) { showToast('Введите название тега', 'error'); return; }
+    let count = 0;
+    data[currentSection].forEach(item => {
+      if (selectedItems.has(item.id)) {
+        if (!item.tags) item.tags = [];
+        if (!item.tags.includes(tag)) { item.tags.push(tag); count++; }
+      }
+    });
+    saveToLocal();
+    renderContent(currentSection);
+    showToast(`🏷️ Тег "${tag}" добавлен к ${count} элементам`, 'success');
+    closeBatchTagModal();
+  }
+  
+  function cancelBatchMode() {
+    batchMode = false;
+    selectedItems.clear();
+    document.getElementById('batch-actions').style.display = 'none';
+    renderContent(currentSection);
+  }
   
   // ==================== CUSTOM DROPDOWN ====================
   function initDropdown(buttonId, menuId, itemsSelector, onSelect, getValue) {
@@ -299,17 +569,24 @@
       tagsContainer.innerHTML = uniqueTags.size ? [...uniqueTags].sort().map(t => `<span class="tag ${currentSelectedTag === t ? 'tag-active' : ''}" onclick="filterByTag('${escapeHtml(t)}')"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('') : '<span class="text-xs text-zinc-500">Нет тегов</span>';
     }
     
-    container.innerHTML = filtered.length ? '' : `<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>${currentSearchQuery || currentSelectedTag ? 'Нет записей по выбранным фильтрам' : 'Пока ничего нет. Добавьте первый элемент!'}</p>${currentSearchQuery || currentSelectedTag ? '<button onclick="clearFilters()" class="text-sm text-violet-400 hover:text-violet-300 mt-2">Сбросить фильтры</button>' : ''}</div>`;
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>${currentSearchQuery || currentSelectedTag ? 'Нет записей по выбранным фильтрам' : 'Пока ничего нет. Добавьте первый элемент!'}</p>${currentSearchQuery || currentSelectedTag ? '<button onclick="clearFilters()" class="text-sm text-violet-400 hover:text-violet-300 mt-2">Сбросить фильтры</button>' : ''}</div>`;
+      return;
+    }
     
+    container.innerHTML = '';
     filtered.forEach(item => {
       const rating = item.rating || 0;
       const statusText = STATUS_MAP[item.status]?.text || '📅 В планах';
       const progressText = item.progress ? ` (${item.progress})` : '';
       const tagsHtml = (item.tags || []).map(t => `<span class="tag"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('');
-      const authorHtml = (section === 'books' && item.author) ? `<div class="text-xs text-zinc-400 mt-1"><i class="fa-regular fa-user"></i> ${escapeHtml(item.author)}</div>` : '';
+      const authorHtml = ((section === 'books' || section === 'movies' || section === 'series') && item.author) ? `<div class="text-xs text-zinc-400 mt-1"><i class="fa-regular fa-user"></i> ${escapeHtml(item.author)}</div>` : '';
       const posterHtml = item.posterUrl ? `<img src="${escapeHtml(item.posterUrl)}" class="w-12 h-16 object-cover rounded-lg shadow-md" onerror="this.style.display='none'" loading="lazy">` : `<div class="w-12 h-16 bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-regular fa-image text-zinc-500 text-xl"></i></div>`;
       const stars = [1,2,3,4,5].map(i => `<i class="fa-${i <= rating ? 'solid' : 'regular'} fa-star rating-star ${i <= rating ? 'rating-star-active' : 'rating-star-inactive'}" style="cursor:pointer;font-size:0.9rem" onclick="updateRating('${section}',${item.id},${i})"></i>`).join('');
-      container.innerHTML += `<div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 content-card transition-all shadow-md"><div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p>${authorHtml}<div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${stars}</div><span class="status-badge">${statusText}${section !== 'books' ? progressText : ''}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div></div>`;
+      const isSelected = selectedItems.has(item.id);
+      const checkboxHtml = batchMode ? `<input type="checkbox" class="card-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelectItem(${item.id})">` : '';
+      const selectedClass = isSelected ? 'selected' : '';
+      container.innerHTML += `<div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 content-card transition-all shadow-md ${selectedClass}" data-id="${item.id}">${checkboxHtml}<div class="card-content"><div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p>${authorHtml}<div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${stars}</div><span class="status-badge">${statusText}${section !== 'books' ? progressText : ''}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div></div></div>`;
     });
     
     document.getElementById('home-screen')?.classList.add('hidden');
@@ -333,11 +610,13 @@
   }
   
   function deleteItem(section, id) {
-    data[section] = data[section].filter(i => i.id !== id);
-    saveToLocal();
-    if (currentSection === section) renderContent(section);
-    updateMenuCounters();
-    showToast('🗑️ Удалено', 'info');
+    showConfirmModal('Вы уверены, что хотите удалить этот элемент? Это действие нельзя отменить.', () => {
+      data[section] = data[section].filter(i => i.id !== id);
+      saveToLocal();
+      if (currentSection === section) renderContent(section);
+      updateMenuCounters();
+      showToast('🗑️ Удалено', 'info');
+    });
   }
   
   function updateRating(section, id, newRating) {
@@ -353,16 +632,20 @@
     document.getElementById('edit-author').value = item.author || '';
     document.getElementById('edit-tags').value = (item.tags || []).join(', ');
     document.getElementById('edit-poster').value = item.posterUrl || '';
-    document.getElementById('edit-progress').value = item.progress || 0;
+    document.getElementById('cover-preview').innerHTML = '';
     currentStatusValue = item.status || 'planned';
     const statusInfo = STATUS_MAP[currentStatusValue];
     document.getElementById('selected-status-text').innerHTML = `<i class="${statusInfo.icon}"></i> ${statusInfo.text}`;
     document.querySelectorAll('#status-menu .dropdown-item').forEach(i => { i.classList.remove('selected'); if (i.getAttribute('data-status') === currentStatusValue) i.classList.add('selected'); });
     
     const isBooks = section === 'books';
+    const isMovieOrSeries = section === 'movies' || section === 'series';
     document.getElementById('progress-field-container').style.display = isBooks ? 'none' : 'flex';
-    document.getElementById('edit-author').style.display = isBooks ? 'flex' : 'none';
+    document.getElementById('edit-author').style.display = (isBooks || isMovieOrSeries) ? 'flex' : 'none';
+    const searchBtn = document.getElementById('search-cover-btn');
+    if (searchBtn) searchBtn.style.display = (isBooks || isMovieOrSeries) ? 'flex' : 'none';
     if (isBooks) document.getElementById('edit-author').placeholder = 'Автор книги';
+    if (isMovieOrSeries) document.getElementById('edit-author').placeholder = 'Режиссёр / Студия';
     document.getElementById('edit-modal').classList.remove('hidden');
     if (window.innerWidth <= 768) closeMobileSidebar();
   }
@@ -373,7 +656,9 @@
     const item = data[section].find(i => i.id === id);
     if (!item) return;
     item.text = document.getElementById('edit-title').value;
-    if (section === 'books') item.author = document.getElementById('edit-author').value;
+    if (section === 'books' || section === 'movies' || section === 'series') {
+      item.author = document.getElementById('edit-author').value;
+    }
     const tagsStr = document.getElementById('edit-tags').value;
     item.tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
     item.posterUrl = document.getElementById('edit-poster').value;
@@ -397,9 +682,9 @@
     const allItems = [];
     SECTIONS.forEach(cat => data[cat].forEach(item => allItems.push({ category: cat, title: item.text, author: item.author || '', date: item.date, rating: item.rating || 0, tags: (item.tags || []).join(', '), status: item.status || 'planned', progress: item.progress || 0, poster: item.posterUrl || '' })));
     let content, ext, type;
-    if (format === 'json') { content = JSON.stringify({ version: '2.2', exportDate: new Date(), data }, null, 2); ext = 'json'; type = 'application/json'; showToast('✅ JSON экспортирован'); }
+    if (format === 'json') { content = JSON.stringify({ version: '2.3', exportDate: new Date(), data }, null, 2); ext = 'json'; type = 'application/json'; showToast('✅ JSON экспортирован'); }
     else if (format === 'csv') {
-      const headers = ['Категория', 'Название', 'Автор', 'Дата', 'Рейтинг', 'Теги', 'Статус', 'Прогресс', 'Постер'];
+      const headers = ['Категория', 'Название', 'Автор/Режиссёр', 'Дата', 'Рейтинг', 'Теги', 'Статус', 'Прогресс', 'Постер'];
       const rows = [headers, ...allItems.map(i => [i.category, i.title, i.author, i.date, i.rating, i.tags, i.status, i.progress, i.poster])];
       content = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
       ext = 'csv'; type = 'text/csv;charset=utf-8;'; content = '\uFEFF' + content; showToast('📊 CSV экспортирован');
@@ -441,6 +726,8 @@
     currentSection = section;
     if (section !== 'home') currentCategory = section;
     currentSearchQuery = ''; currentSelectedTag = null;
+    batchMode = false; selectedItems.clear();
+    document.getElementById('batch-actions').style.display = 'none';
     const searchInput = document.getElementById('search-input');
     if (searchInput) searchInput.value = '';
     document.getElementById('header-title').innerText = { home: '🏠 Главная', ...SECTION_NAMES }[section];
@@ -457,36 +744,12 @@
   
   function setActiveMenu(el) { document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active')); if (el) el.classList.add('active'); }
   function toggleTheme() { isDark = !isDark; document.documentElement.classList.toggle('light', !isDark); document.documentElement.classList.toggle('dark', isDark); const icon = document.getElementById('theme-icon-header'); if (icon) icon.className = `fa-solid ${isDark ? 'fa-sun' : 'fa-moon'} text-xl`; }
-  function toggleSidebarDesktop() {
-    if (window.innerWidth <= 768) return;
-    isCollapsed = !isCollapsed;
-    const sidebar = document.getElementById('sidebar'), main = document.getElementById('main-content');
-    const topIcon = document.querySelector('#toggle-btn-top i'), bottomText = document.getElementById('bottom-toggle-text'), bottomIcon = document.getElementById('bottom-toggle-icon');
-    if (isCollapsed) {
-      sidebar.style.width = '64px'; main.style.marginLeft = '64px'; sidebar.classList.add('sidebar-collapsed');
-      if (topIcon) topIcon.className = 'fa-solid fa-chevron-right text-xl';
-      if (bottomText) bottomText.style.display = 'none';
-      if (bottomIcon) bottomIcon.className = 'fa-solid fa-chevron-right text-lg';
-    } else {
-      sidebar.style.width = '260px'; main.style.marginLeft = '260px'; sidebar.classList.remove('sidebar-collapsed');
-      if (topIcon) topIcon.className = 'fa-solid fa-chevron-left text-xl';
-      if (bottomText) bottomText.style.display = 'inline-block';
-      if (bottomIcon) bottomIcon.className = 'fa-solid fa-chevron-left text-lg';
-    }
-  }
+  
   function toggleMobileSidebar() { document.body.classList.toggle('sidebar-mobile-open'); }
   function closeMobileSidebar() { document.body.classList.remove('sidebar-mobile-open'); }
   
   // ==================== INITIALIZATION ====================
   window.addEventListener('DOMContentLoaded', () => {
-    if (window.innerWidth > 768) {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('main-content');
-      sidebar.style.width = '64px';
-      main.style.marginLeft = '64px';
-      sidebar.classList.add('sidebar-collapsed');
-      document.getElementById('bottom-toggle-text').style.display = 'none';
-    }
     initDropdown('dropdown-button', 'dropdown-menu', '#dropdown-menu .dropdown-item', (val, item) => { currentCategory = val; const icon = item.querySelector('i').cloneNode(true); document.getElementById('selected-category-text').innerHTML = icon.outerHTML + ' ' + item.textContent.trim(); }, i => i.getAttribute('data-value'));
     initDropdown('status-button', 'status-menu', '#status-menu .dropdown-item', (val) => { currentStatusValue = val; const info = STATUS_MAP[val]; document.getElementById('selected-status-text').innerHTML = `<i class="${info.icon}"></i> ${info.text}`; }, i => i.getAttribute('data-status'));
     updateMenuCounters();
