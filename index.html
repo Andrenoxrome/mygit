@@ -32,58 +32,6 @@
     .tag-active { background: #8b5cf6; color: white; }
     .modal { transition: opacity 0.2s ease; }
     
-    /* Красивый логотип */
-    .logo-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3), 0 0 0 2px rgba(255,255,255,0.1);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .logo-icon::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
-      border-radius: 20px;
-    }
-    .logo-icon i {
-      font-size: 1.4rem;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      z-index: 1;
-    }
-    .logo-icon:hover {
-      transform: scale(1.02) rotate(2deg);
-      box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4);
-    }
-    .logo-text {
-      font-size: 1.35rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #f4f4f5 0%, #c084fc 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      letter-spacing: -0.3px;
-    }
-    html.light .logo-text {
-      background: linear-gradient(135deg, #18181b 0%, #7c3aed 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-    }
-    
     select, select:focus, select:active, select option { outline: none; }
     select#section-select, select#edit-status {
       background-color: rgb(39 39 42) !important;
@@ -142,6 +90,58 @@
     
     .search-input { transition: all 0.2s; }
     .filter-tags-container { max-height: 80px; overflow-y: auto; scrollbar-width: thin; }
+
+    /* Красивый логотип с глобусом */
+    .logo-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3), 0 0 0 2px rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
+      border-radius: 20px;
+    }
+    .logo-icon i {
+      font-size: 1.4rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .logo-icon:hover {
+      transform: scale(1.02) rotate(2deg);
+      box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+    }
+    .logo-text {
+      font-size: 1.35rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f4f4f5 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+    html.light .logo-text {
+      background: linear-gradient(135deg, #18181b 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
   </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex overflow-hidden">
@@ -153,7 +153,7 @@
     <div class="flex items-center gap-3">
       <div class="logo-wrapper">
         <div class="logo-icon">
-          <i class="fa-solid fa-book-open"></i>
+          <i class="fa-solid fa-globe"></i>
         </div>
       </div>
       <span id="logo-text" class="logo-text">MyGit</span>
@@ -165,6 +165,8 @@
     <a href="#" onclick="switchSection('books'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-book w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Книги</span></a>
     <a href="#" onclick="switchSection('series'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-tv w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Сериалы</span></a>
     <a href="#" onclick="switchSection('movies'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-film w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Кино</span></a>
+    <a href="#" onclick="switchSection('travel'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-plane w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Путешествия</span></a>
+    <a href="#" onclick="switchSection('articles'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-newspaper w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">Статьи</span></a>
     <a href="#" onclick="switchSection('wishlist'); setActiveMenu(this); closeMobileSidebar(); return false;" class="menu-item flex items-center gap-4 px-4 py-3 hover:bg-zinc-800 rounded-xl"><i class="fa-solid fa-heart w-6 h-6 text-zinc-400"></i><span class="menu-text text-sm font-medium">WishList</span></a>
   </div>
   <div class="p-4 border-t border-zinc-700/50">
@@ -189,16 +191,16 @@
       <div class="text-center mb-6 md:mb-12">
         <div class="inline-flex items-center justify-center mb-4">
           <div class="logo-icon w-16 h-16 md:w-20 md:h-20 rounded-3xl shadow-2xl">
-            <i class="fa-solid fa-book-open text-2xl md:text-3xl"></i>
+            <i class="fa-solid fa-globe text-2xl md:text-3xl"></i>
           </div>
         </div>
         <p class="text-3xl md:text-5xl font-light bg-gradient-to-r from-zinc-200 via-violet-300 to-zinc-400 bg-clip-text text-transparent">Что добавим?</p>
-        <p class="text-zinc-500 text-xs md:text-sm mt-3">Книги, сериалы, кино — с рейтингом, тегами и прогрессом</p>
+        <p class="text-zinc-500 text-xs md:text-sm mt-3">Книги, сериалы, кино, путешествия, статьи — с рейтингом, тегами и прогрессом</p>
       </div>
       <div class="w-full">
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-zinc-900 border border-zinc-700 focus-within:border-violet-500 rounded-3xl px-2 py-2 gap-2 shadow-xl">
           <select id="section-select" class="text-base font-medium px-4 py-3 focus:outline-none cursor-pointer" style="border-radius: 24px;">
-            <option value="books">📚 Книги</option><option value="series">📺 Сериалы</option><option value="movies">🎬 Кино</option><option value="wishlist">💖 WishList</option>
+            <option value="books">📚 Книги</option><option value="series">📺 Сериалы</option><option value="movies">🎬 Кино</option><option value="travel">✈️ Путешествия</option><option value="articles">📰 Статьи</option><option value="wishlist">💖 WishList</option>
           </select>
           <div class="flex-1 relative"><textarea id="input" rows="1" class="w-full bg-transparent border-0 focus:outline-none text-base py-3 px-3 resize-none placeholder-zinc-500" placeholder="Название..."></textarea></div>
           <button onclick="sendMessage()" class="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 w-11 h-11 flex items-center justify-center rounded-2xl transition-all active:scale-95 shadow-lg"><i class="fa-solid fa-paper-plane text-white"></i></button>
@@ -245,8 +247,8 @@
   let currentSearchQuery = '';
   let currentSelectedTag = null;
   
-  let data = { books: [], series: [], movies: [], wishlist: [] };
-  ['books', 'series', 'movies', 'wishlist'].forEach(s => { data[s] = JSON.parse(localStorage.getItem(s)) || []; });
+  let data = { books: [], series: [], movies: [], travel: [], articles: [], wishlist: [] };
+  ['books', 'series', 'movies', 'travel', 'articles', 'wishlist'].forEach(s => { data[s] = JSON.parse(localStorage.getItem(s)) || []; });
 
   function showToast(msg, type='success'){ const c=document.getElementById('toast-container'), t=document.createElement('div'), bg={success:'bg-green-600',error:'bg-red-600',info:'bg-blue-600'}[type]; t.className=`${bg} text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 toast-notification`; t.innerHTML=`<i class="fa-solid ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle'}"></i><span>${msg}</span>`; c.appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(20px)';setTimeout(()=>t.remove(),300);},2500); }
 
@@ -266,13 +268,13 @@
   function closeModal(){ document.getElementById('edit-modal').classList.add('hidden'); }
   function saveEdit(){ let {section,id}=currentEditItem; let item=data[section].find(i=>i.id==id); if(item){ item.text=document.getElementById('edit-title').value; let tagsStr=document.getElementById('edit-tags').value; item.tags=tagsStr?tagsStr.split(',').map(t=>t.trim()).filter(t=>t):[]; item.posterUrl=document.getElementById('edit-poster').value; item.status=document.getElementById('edit-status').value; item.progress=parseInt(document.getElementById('edit-progress').value)||0; localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); showToast('✏️ Запись обновлена','success'); closeModal(); } }
 
-  function exportData(format){ let allItems=[]; ['books','series','movies','wishlist'].forEach(cat=>{ data[cat].forEach(item=>{ allItems.push({category:cat,title:item.text,date:item.date,rating:item.rating||0,tags:(item.tags||[]).join(', '),status:item.status||'planned',progress:item.progress||0,poster:item.posterUrl||''}); }); });
-    if(format==='json'){ let blob=new Blob([JSON.stringify({version:"2.1",exportDate:new Date(),data:data},null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.json`; a.click(); URL.revokeObjectURL(a.href); showToast('✅ JSON экспортирован'); }
+  function exportData(format){ let allItems=[]; ['books','series','movies','travel','articles','wishlist'].forEach(cat=>{ data[cat].forEach(item=>{ allItems.push({category:cat,title:item.text,date:item.date,rating:item.rating||0,tags:(item.tags||[]).join(', '),status:item.status||'planned',progress:item.progress||0,poster:item.posterUrl||''}); }); });
+    if(format==='json'){ let blob=new Blob([JSON.stringify({version:"2.2",exportDate:new Date(),data:data},null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.json`; a.click(); URL.revokeObjectURL(a.href); showToast('✅ JSON экспортирован'); }
     else if(format==='csv'){ let headers=['Категория','Название','Дата','Рейтинг','Теги','Статус','Прогресс','Постер']; let rows=[headers]; allItems.forEach(i=>rows.push([i.category,i.title,i.date,i.rating,i.tags,i.status,i.progress,i.poster])); let csv=rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n'); let blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href); showToast('📊 CSV экспортирован'); }
     else if(format==='txt'){ let txt='=== MYGIT ТРЕКЕР КОНТЕНТА ===\n\n'; allItems.forEach(i=>{ txt+=`[${i.category.toUpperCase()}] ${i.title}\n   Дата: ${i.date} | Рейтинг: ${i.rating}⭐ | Статус: ${i.status} | Прогресс: ${i.progress}\n   Теги: ${i.tags||'нет'} | Постер: ${i.poster||'нет'}\n\n`; }); let blob=new Blob([txt],{type:'text/plain'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`mygit_${new Date().toISOString().slice(0,19)}.txt`; a.click(); URL.revokeObjectURL(a.href); showToast('📄 TXT экспортирован'); }
   }
 
-  function importData(input){ let file=input.files[0]; if(!file) return; let reader=new FileReader(); reader.onload=e=>{ try{ let imported=JSON.parse(e.target.result); let newData=imported.data||imported; if(newData.books&&newData.series&&newData.movies&&newData.wishlist) data=newData; else throw new Error(); ['books','series','movies','wishlist'].forEach(s=>{ localStorage.setItem(s,JSON.stringify(data[s]||[])); if(!data[s]) data[s]=[]; }); if(currentSection!=='home') renderContent(currentSection); showToast('📦 Импорт успешен'); input.value=''; }catch(err){ showToast('Ошибка импорта','error'); input.value=''; } }; reader.readAsText(file); }
+  function importData(input){ let file=input.files[0]; if(!file) return; let reader=new FileReader(); reader.onload=e=>{ try{ let imported=JSON.parse(e.target.result); let newData=imported.data||imported; if(newData.books&&newData.series&&newData.movies&&newData.wishlist) data=newData; else throw new Error(); ['books','series','movies','travel','articles','wishlist'].forEach(s=>{ localStorage.setItem(s,JSON.stringify(data[s]||[])); if(!data[s]) data[s]=[]; }); if(currentSection!=='home') renderContent(currentSection); showToast('📦 Импорт успешен'); input.value=''; }catch(err){ showToast('Ошибка импорта','error'); input.value=''; } }; reader.readAsText(file); }
 
   function sendMessage(){ let input=document.getElementById('input'), select=document.getElementById('section-select'); if(!input.value.trim()) return; let text=input.value.trim(), section=select.value; let newItem={id:Date.now(),text:text,date:new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}),rating:0,tags:[],posterUrl:'',status:'planned',progress:0}; data[section].unshift(newItem); localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); input.value=''; input.style.height='auto'; showToast(`➕ Добавлено в ${select.options[select.selectedIndex].text}`); }
 
@@ -280,11 +282,7 @@
 
   function getUniqueTagsFromItems(items){
     let tagsSet = new Set();
-    items.forEach(item => {
-      if(item.tags && Array.isArray(item.tags)){
-        item.tags.forEach(tag => tagsSet.add(tag));
-      }
-    });
+    items.forEach(item => { if(item.tags && Array.isArray(item.tags)){ item.tags.forEach(tag => tagsSet.add(tag)); } });
     return Array.from(tagsSet).sort();
   }
 
@@ -292,102 +290,40 @@
     const container = document.getElementById('filter-tags-list');
     if(!container) return;
     const uniqueTags = getUniqueTagsFromItems(items);
-    if(uniqueTags.length === 0){
-      container.innerHTML = '<span class="text-xs text-zinc-500">Нет тегов</span>';
-      return;
-    }
-    container.innerHTML = uniqueTags.map(tag => `
-      <span class="tag ${currentSelectedTag === tag ? 'tag-active' : ''}" onclick="filterByTag('${escapeHtml(tag).replace(/'/g, "\\'")}')">
-        <i class="fa-regular fa-hashtag"></i>${escapeHtml(tag)}
-      </span>
-    `).join('');
+    if(uniqueTags.length === 0){ container.innerHTML = '<span class="text-xs text-zinc-500">Нет тегов</span>'; return; }
+    container.innerHTML = uniqueTags.map(tag => `<span class="tag ${currentSelectedTag === tag ? 'tag-active' : ''}" onclick="filterByTag('${escapeHtml(tag).replace(/'/g, "\\'")}')"><i class="fa-regular fa-hashtag"></i>${escapeHtml(tag)}</span>`).join('');
   }
 
-  function filterByTag(tag){
-    if(currentSelectedTag === tag){
-      currentSelectedTag = null;
-    } else {
-      currentSelectedTag = tag;
-    }
-    renderContent(currentSection);
-  }
-
-  function clearFilters(){
-    currentSearchQuery = '';
-    currentSelectedTag = null;
-    document.getElementById('search-input').value = '';
-    renderContent(currentSection);
-    showToast('Фильтры сброшены', 'info');
-  }
-
-  function filterItems(items){
-    let filtered = [...items];
-    if(currentSearchQuery){
-      const query = currentSearchQuery.toLowerCase();
-      filtered = filtered.filter(item => item.text.toLowerCase().includes(query));
-    }
-    if(currentSelectedTag){
-      filtered = filtered.filter(item => item.tags && item.tags.includes(currentSelectedTag));
-    }
-    return filtered;
-  }
+  function filterByTag(tag){ if(currentSelectedTag === tag){ currentSelectedTag = null; } else { currentSelectedTag = tag; } renderContent(currentSection); }
+  function clearFilters(){ currentSearchQuery = ''; currentSelectedTag = null; document.getElementById('search-input').value = ''; renderContent(currentSection); showToast('Фильтры сброшены', 'info'); }
+  function filterItems(items){ let filtered = [...items]; if(currentSearchQuery){ const query = currentSearchQuery.toLowerCase(); filtered = filtered.filter(item => item.text.toLowerCase().includes(query)); } if(currentSelectedTag){ filtered = filtered.filter(item => item.tags && item.tags.includes(currentSelectedTag)); } return filtered; }
 
   function renderContent(section){ 
-    let container=document.getElementById('content-list'); 
-    if(!container) return; 
-    let items=data[section]; 
-    let filteredItems = filterItems(items);
-    
-    updateFilterTagsList(items);
-    
+    let container=document.getElementById('content-list'); if(!container) return; 
+    let items=data[section]; let filteredItems = filterItems(items); updateFilterTagsList(items);
     container.innerHTML=''; 
-    if(!filteredItems.length){ 
-      let message = '';
-      if(currentSearchQuery || currentSelectedTag) message = 'Нет записей по выбранным фильтрам';
-      else message = 'Пока ничего нет. Добавьте первый элемент!';
-      container.innerHTML=`<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>${message}</p>${(currentSearchQuery || currentSelectedTag) ? '<button onclick="clearFilters()" class="text-sm text-violet-400 hover:text-violet-300 mt-2">Сбросить фильтры</button>' : ''}</div>`; 
-      return; 
-    }
-    filteredItems.forEach(item=>{ 
-      let rating=item.rating||0; 
-      let statusMap={planned:'📅 В планах',progress:'⏳ В процессе',completed:'✅ Завершено',abandoned:'❌ Брошено'}; 
-      let statusText=statusMap[item.status]||'📅 В планах'; 
-      let progressText=item.progress?` (${item.progress})`:''; 
-      let tagsHtml=(item.tags||[]).map(t=>`<span class="tag"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('');
+    if(!filteredItems.length){ let message = (currentSearchQuery || currentSelectedTag) ? 'Нет записей по выбранным фильтрам' : 'Пока ничего нет. Добавьте первый элемент!';
+      container.innerHTML=`<div class="flex flex-col items-center justify-center py-16 text-zinc-500 gap-3"><i class="fa-regular fa-folder-open text-4xl"></i><p>${message}</p>${(currentSearchQuery || currentSelectedTag) ? '<button onclick="clearFilters()" class="text-sm text-violet-400 hover:text-violet-300 mt-2">Сбросить фильтры</button>' : ''}</div>`; return; }
+    filteredItems.forEach(item=>{ let rating=item.rating||0; let statusMap={planned:'📅 В планах',progress:'⏳ В процессе',completed:'✅ Завершено',abandoned:'❌ Брошено'}; let statusText=statusMap[item.status]||'📅 В планах'; let progressText=item.progress?` (${item.progress})`:''; let tagsHtml=(item.tags||[]).map(t=>`<span class="tag"><i class="fa-regular fa-hashtag"></i>${escapeHtml(t)}</span>`).join('');
       let posterHtml=item.posterUrl?`<img src="${escapeHtml(item.posterUrl)}" class="w-12 h-16 object-cover rounded-lg shadow-md" onerror="this.style.display='none'" loading="lazy">`:`<div class="w-12 h-16 bg-zinc-800 rounded-lg flex items-center justify-center"><i class="fa-regular fa-image text-zinc-500 text-xl"></i></div>`;
       let card=document.createElement('div'); card.className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 content-card transition-all shadow-md";
       card.innerHTML=`<div class="flex gap-4"><div class="flex-shrink-0">${posterHtml}</div><div class="flex-1"><div class="flex justify-between items-start gap-2"><div><p class="text-zinc-200 text-base font-medium break-words">${escapeHtml(item.text)}</p><div class="flex flex-wrap gap-1 mt-1">${tagsHtml}</div></div><div class="flex gap-1"><button onclick="openEdit('${section}',${item.id})" class="text-zinc-500 hover:text-blue-400 p-1 transition-colors"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem('${section}',${item.id})" class="text-zinc-500 hover:text-red-400 p-1 transition-colors"><i class="fa-regular fa-trash-can"></i></button></div></div><div class="flex items-center gap-2 mt-2 flex-wrap"><div class="stars-container flex gap-0.5">${[1,2,3,4,5].map(i=>`<i class="fa-${i<=rating?'solid':'regular'} fa-star rating-star ${i<=rating?'rating-star-active':'rating-star-inactive'}" style="cursor:pointer;font-size:0.9rem" onclick="updateRating('${section}',${item.id},${i})"></i>`).join('')}</div><span class="status-badge">${statusText}${progressText}</span><span class="text-xs text-zinc-500"><i class="fa-regular fa-calendar"></i> ${item.date}</span></div></div></div>`;
       container.appendChild(card);
     });
-    document.getElementById('home-screen')?.classList.add('hidden'); 
-    document.getElementById('section-screen')?.classList.remove('hidden');
-    let titleMap={books:"📖 Книги",series:"📺 Сериалы",movies:"🎬 Кино",wishlist:"❤️ WishList"}; 
-    let filterInfo = '';
-    if(currentSearchQuery) filterInfo += ` 🔍 "${currentSearchQuery}"`;
-    if(currentSelectedTag) filterInfo += ` 🏷️ #${currentSelectedTag}`;
-    let titleElem = document.getElementById('content-title');
-    if(titleElem) titleElem.innerHTML=titleMap[section]+` <span class="text-sm text-zinc-500">(${filteredItems.length}/${items.length})</span>${filterInfo ? `<span class="text-xs text-violet-400 ml-2">${filterInfo}</span>` : ''}`;
+    document.getElementById('home-screen')?.classList.add('hidden'); document.getElementById('section-screen')?.classList.remove('hidden');
+    let titleMap={books:"📖 Книги",series:"📺 Сериалы",movies:"🎬 Кино",travel:"✈️ Путешествия",articles:"📰 Статьи",wishlist:"💖 WishList"}; 
+    let filterInfo = ''; if(currentSearchQuery) filterInfo += ` 🔍 "${currentSearchQuery}"`; if(currentSelectedTag) filterInfo += ` 🏷️ #${currentSelectedTag}`;
+    let titleElem = document.getElementById('content-title'); if(titleElem) titleElem.innerHTML=titleMap[section]+` <span class="text-sm text-zinc-500">(${filteredItems.length}/${items.length})</span>${filterInfo ? `<span class="text-xs text-violet-400 ml-2">${filterInfo}</span>` : ''}`;
   }
 
   function deleteItem(section,id){ data[section]=data[section].filter(i=>i.id!==id); localStorage.setItem(section,JSON.stringify(data[section])); if(currentSection===section) renderContent(section); showToast('🗑️ Удалено','info'); }
   
   function switchSection(section){ 
-    currentSection=section; 
-    currentSearchQuery = '';
-    currentSelectedTag = null;
+    currentSection=section; currentSearchQuery = ''; currentSelectedTag = null;
     if(document.getElementById('search-input')) document.getElementById('search-input').value = '';
-    let titles={home:"🏠 Главная",books:"📚 Книги",series:"📺 Сериалы",movies:"🎬 Кино",wishlist:"💖 WishList"}; 
+    let titles={home:"🏠 Главная",books:"📚 Книги",series:"📺 Сериалы",movies:"🎬 Кино",travel:"✈️ Путешествия",articles:"📰 Статьи",wishlist:"💖 WishList"}; 
     document.getElementById('header-title').innerText=titles[section]; 
-    if(section==='home'){ 
-      document.getElementById('home-screen')?.classList.remove('hidden'); 
-      document.getElementById('section-screen')?.classList.add('hidden'); 
-    } else { 
-      renderContent(section); 
-      document.getElementById('home-screen')?.classList.add('hidden'); 
-      document.getElementById('section-screen')?.classList.remove('hidden'); 
-    } 
-    closeMobileSidebar(); 
-  }
+    if(section==='home'){ document.getElementById('home-screen')?.classList.remove('hidden'); document.getElementById('section-screen')?.classList.add('hidden'); } else { renderContent(section); document.getElementById('home-screen')?.classList.add('hidden'); document.getElementById('section-screen')?.classList.remove('hidden'); } closeMobileSidebar(); }
   
   function setActiveMenu(el){ document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active'); }
   function toggleTheme(){ isDark=!isDark; let html=document.documentElement; if(isDark){ html.classList.remove('light'); html.classList.add('dark'); document.getElementById('theme-icon-header')?.classList.replace('fa-moon','fa-sun'); } else { html.classList.remove('dark'); html.classList.add('light'); document.getElementById('theme-icon-header')?.classList.replace('fa-sun','fa-moon'); } }
@@ -396,29 +332,11 @@
   function closeMobileSidebar(){ document.body.classList.remove('sidebar-mobile-open'); }
   function escapeHtml(str){ return String(str).replace(/[&<>]/g,function(m){if(m==='&') return '&amp;';if(m==='<') return '&lt;';if(m==='>') return '&gt;';return m;}); }
   
-  let textarea=document.getElementById('input'); 
-  if(textarea){ 
-    textarea.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,160)+'px';}); 
-    textarea.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}); 
-  }
-  
-  let searchInput = document.getElementById('search-input');
-  if(searchInput){
-    searchInput.addEventListener('input', (e) => {
-      currentSearchQuery = e.target.value;
-      if(currentSection !== 'home') renderContent(currentSection);
-    });
-  }
+  let textarea=document.getElementById('input'); if(textarea){ textarea.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,160)+'px';}); textarea.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}); }
+  let searchInput = document.getElementById('search-input'); if(searchInput){ searchInput.addEventListener('input', (e) => { currentSearchQuery = e.target.value; if(currentSection !== 'home') renderContent(currentSection); }); }
   
   window.addEventListener('DOMContentLoaded',()=>{ 
-    if(window.innerWidth>768){ 
-      let s=document.getElementById('sidebar'),m=document.getElementById('main-content'); 
-      s.style.width='64px'; m.style.marginLeft='64px'; s.classList.add('sidebar-collapsed'); isCollapsed=true; 
-      document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='center';i.style.paddingLeft='0';i.style.paddingRight='0';}); 
-      let bt=document.getElementById('bottom-toggle-text'); if(bt) bt.style.display='none'; 
-    } 
-    switchSection('home'); 
-  });
+    if(window.innerWidth>768){ let s=document.getElementById('sidebar'),m=document.getElementById('main-content'); s.style.width='64px'; m.style.marginLeft='64px'; s.classList.add('sidebar-collapsed'); isCollapsed=true; document.querySelectorAll('.menu-item').forEach(i=>{i.style.justifyContent='center';i.style.paddingLeft='0';i.style.paddingRight='0';}); let bt=document.getElementById('bottom-toggle-text'); if(bt) bt.style.display='none'; } switchSection('home'); });
 </script>
 </body>
 </html>
